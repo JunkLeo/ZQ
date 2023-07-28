@@ -1,0 +1,12 @@
+Type,Product,Unit,TickSize
+futures,IC,200,0.2
+futures,IF,300,0.2
+futures,IH,300,0.2
+futures,IM,200,0.2
+futures,T,10000,0.005
+futures,TF,10000,0.005
+futures,TL,10000,0.01
+futures,TS,20000,0.005
+option,HO,100,0.2
+option,IO,100,0.2
+option,MO,100,0.2

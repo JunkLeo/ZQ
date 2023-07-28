@@ -3,25 +3,33 @@
 Date: 2023/07/27
 Desc: 中金所每日REF/EOD
 """
+import os
 import pandas as pd
 from random import randint
+from pathlib import Path
+config_path = os.path.join(Path(__file__).parents[1], "config")
 
 
-class CFE:
+class CFFEX:
 
     def __init__(self):
+        self.config_file = os.path.join(config_path, "cffex.csv")
         self.tip_url = "http://www.cffex.com.cn/cp/index_6719.xml?id={id}"
         self.ref_url = "http://www.cffex.com.cn/sj/jycs/{YYYYMM}/{DD}/index.xml?id={id}"
         self.eod_url = "http://www.cffex.com.cn/sj/hqsj/rtj/{YYYYMM}/{DD}/index.xml?id={id}"
 
-        self.ref_columns = ["InstrumentID", "ProductID", "ListPrice", "UpperLimitPrice", "LowerLimitPrice", "PositionLimit", "FirstTradingDay", "LastTradingDay", "LastDeliveryDay"]
+        self.ref_columns = [
+            "InstrumentID", "ProductID", "Unit", "TickSize", "ListPrice", "UpperLimitPrice", "LowerLimitPrice", "PositionLimit", "FirstTradingDay", "LastTradingDay", "FirstDeliveryDay",
+            "LastDeliveryDay"
+        ]
         self.eod_columns = ["InstrumentID", "TradingDay", "OpenPrice", "HighPrice", "LowPrice", "ClosePrice", "PreSettlePrice", "SettlePrice", "Volume", "Turnover", "OpenInterest"]
 
     def get_tip(self) -> pd.DataFrame:
         rand_id = str(randint(10, 60))
         tip = pd.read_xml(self.tip_url.format(id=rand_id))
         tip = tip[~tip["INSTRUMENTID"].str.contains("-")]
-        tip = tip[["INSTRUMENTID", "ENDDELIVDATE"]]
+        tip = tip[["INSTRUMENTID", "STARTDELIVDATE", "ENDDELIVDATE"]]
+        tip["STARTDELIVDATE"] = tip["STARTDELIVDATE"].map(lambda x: x if pd.isna(x) else str(int(x)))
         tip["ENDDELIVDATE"] = tip["ENDDELIVDATE"].map(lambda x: x if pd.isna(x) else str(int(x)))
         return tip
 
@@ -30,7 +38,11 @@ class CFE:
         ref = pd.read_xml(self.ref_url.format(YYYYMM=date[:6], DD=date[6:], id=rand_id))
         if product != "all":
             ref = ref[ref["PRODUCT_ID"] == product]
-        columns = ["INSTRUMENT_ID", "PRODUCT_ID", "BASIS_PRICE", "UPPERLIMITPRICE", "LOWERLIMITPRICE", "LONG_LIMIT", "OPEN_DATE", "END_TRADING_DAY"]
+        config = pd.read_csv(self.config_file, dtype=str)
+        config = config[config["Type"] == "futures"].set_index("Product")
+        ref["Unit"] = ref["PRODUCT_ID"].map(lambda x: config.loc[x, "Unit"])
+        ref["TickSize"] = ref["PRODUCT_ID"].map(lambda x: config.loc[x, "TickSize"])
+        columns = ["INSTRUMENT_ID", "PRODUCT_ID", "Unit", "TickSize", "BASIS_PRICE", "UPPERLIMITPRICE", "LOWERLIMITPRICE", "LONG_LIMIT", "OPEN_DATE", "END_TRADING_DAY"]
         ref = ref[~ref["INSTRUMENT_ID"].str.contains("-")][columns]
         if mode == "ongoing":
             tip = self.get_tip()
@@ -53,6 +65,6 @@ class CFE:
 
 
 if __name__ == "__main__":
-    cfe = CFE()
-    print(cfe.get_ref("20230727", product="IH"))
-    print(cfe.get_eod("20230727", product="IH"))
+    cffex = CFFEX()
+    print(cffex.get_ref("20230727", product="T"))
+    print(cffex.get_eod("20230727", product="T"))

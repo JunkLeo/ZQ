@@ -5,6 +5,7 @@ Desc: 大商所每日REF/EOD
 """
 import requests
 import pandas as pd
+from decimal import Decimal
 
 
 class DCE:
@@ -74,10 +75,11 @@ class DCE:
         if product != "all":
             eod = eod[eod["ProductID"] == product]
         eod = eod[self.eod_columns]
+        eod["Turnover"] = eod["Turnover"].map(lambda x: Decimal(str(x)) * 10000)
         return eod
 
 
 if __name__ == "__main__":
     dce = DCE()
     print(dce.get_ref())
-    print(dce.get_eod("20230727"))
+    print(dce.get_eod("20230728"))
