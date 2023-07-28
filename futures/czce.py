@@ -27,7 +27,7 @@ class CZCE:
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
         }
 
-    def get_ref(self, date: str, product: str = "all") -> pd.DataFrame:
+    def get_ref(self, date: str) -> pd.DataFrame:
         ref = pd.read_html(self.ref_url.format(year=date[:4], date=date))[0]
         ref.columns = [col[0] for col in ref.columns.values]
         ref = ref.iloc[:-1, :]
@@ -41,7 +41,7 @@ class CZCE:
             ref[column] = ref[column].map(lambda x: x.replace("-", ""))
         return ref
 
-    def get_eod(self, date: str, product: str = "all") -> pd.DataFrame:
+    def get_eod(self, date: str) -> pd.DataFrame:
         eod = pd.read_html(self.eod_url.format(year=date[:4], date=date))[0]
         eod = eod.iloc[:-1, :]
         eod["TradingDay"] = date

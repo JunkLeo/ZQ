@@ -45,16 +45,14 @@ class DCE:
         tp.columns = self.tp_columns
         return tp
 
-    def get_ref(self, product: str = "all") -> pd.DataFrame:
+    def get_ref(self) -> pd.DataFrame:
         ci = self.get_contract_info()
         tp = self.get_trade_para()
         ref = pd.merge(ci, tp, on="InstrumentID")
         ref = ref[self.ref_columns]
-        if product != "all":
-            ref = ref[ref["ProductID"] == product]
         return ref
 
-    def get_eod(self, date: str, product: str = "all") -> pd.DataFrame:
+    def get_eod(self, date: str) -> pd.DataFrame:
         para = {
             "dayQuotes.trade_type": "0",
             "year": date[:4],
@@ -72,8 +70,6 @@ class DCE:
         eod = eod[~eod["SettlePrice"].isna()]
         eod["ProductID"] = eod["InstrumentID"].map(lambda x: x[:-4])
         eod["TradingDay"] = date
-        if product != "all":
-            eod = eod[eod["ProductID"] == product]
         eod = eod[self.eod_columns]
         eod["Turnover"] = eod["Turnover"].map(lambda x: Decimal(str(x)) * 10000)
         return eod

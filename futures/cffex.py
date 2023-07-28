@@ -33,13 +33,10 @@ class CFFEX:
         tip["ENDDELIVDATE"] = tip["ENDDELIVDATE"].map(lambda x: x if pd.isna(x) else str(int(x)))
         return tip
 
-    def get_ref(self, date: str, mode: str = "ongoing", product: str = "all") -> pd.DataFrame:
+    def get_ref(self, date: str, mode: str = "ongoing") -> pd.DataFrame:
         rand_id = str(randint(10, 60))
         ref = pd.read_xml(self.ref_url.format(YYYYMM=date[:6], DD=date[6:], id=rand_id))
-        if product != "all":
-            ref = ref[ref["PRODUCT_ID"] == product]
-        config = pd.read_csv(self.config_file, dtype=str)
-        config = config[config["Type"] == "futures"].set_index("Product")
+        config = pd.read_csv(self.config_file, dtype=str).set_index("Product")
         ref["Unit"] = ref["PRODUCT_ID"].map(lambda x: config.loc[x, "Unit"])
         ref["TickSize"] = ref["PRODUCT_ID"].map(lambda x: config.loc[x, "TickSize"])
         columns = ["INSTRUMENT_ID", "PRODUCT_ID", "Unit", "TickSize", "BASIS_PRICE", "UPPERLIMITPRICE", "LOWERLIMITPRICE", "LONG_LIMIT", "OPEN_DATE", "END_TRADING_DAY"]
@@ -53,11 +50,9 @@ class CFFEX:
             ref.columns = self.ref_columns[:-2]
         return ref
 
-    def get_eod(self, date: str, product: str = "all") -> pd.DataFrame:
+    def get_eod(self, date: str) -> pd.DataFrame:
         rand_id = str(randint(10, 60))
         eod = pd.read_xml(self.eod_url.format(YYYYMM=date[:6], DD=date[6:], id=rand_id))
-        if product != "all":
-            eod = eod[eod["productid"] == product]
         columns = ["instrumentid", "tradingday", "openprice", "highestprice", "lowestprice", "closeprice", "presettlementprice", "settlementprice", "volume", "turnover", "openinterest"]
         eod = eod[~eod["instrumentid"].str.contains("-")][columns]
         eod.columns = self.eod_columns
@@ -66,5 +61,5 @@ class CFFEX:
 
 if __name__ == "__main__":
     cffex = CFFEX()
-    print(cffex.get_ref("20230727", product="T"))
-    print(cffex.get_eod("20230727", product="T"))
+    print(cffex.get_ref("20230728"))
+    print(cffex.get_eod("20230728"))

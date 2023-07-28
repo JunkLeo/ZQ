@@ -71,7 +71,7 @@ class SHFE:
         low = new_round(floor(low / tick_size) * tick_size)
         return low
 
-    def get_ref(self, date: str, product: str = "all") -> pd.DataFrame:
+    def get_ref(self, date: str) -> pd.DataFrame:
         ci = self.get_contract_info(date)
         tp = self.get_trade_para(date)
         ref = pd.merge(ci, tp, on="InstrumentID")
@@ -86,11 +86,9 @@ class SHFE:
         ref["UpperLimitPrice"] = ref.apply(self.calc_upper, axis=1)
         ref["LowerLimitPrice"] = ref.apply(self.calc_lower, axis=1)
         ref = ref[self.ref_columns]
-        if product != "all":
-            ref = ref[ref["ProductID"] == product]
         return ref
 
-    def get_eod(self, date: str, product: str = "all") -> pd.DataFrame:
+    def get_eod(self, date: str) -> pd.DataFrame:
         r = requests.get(url=self.eod_url.format(date=date), headers=self.headers)
         eod = pd.DataFrame(r.json()["o_curinstrument"])
         eod["InstrumentID"] = eod.apply(lambda x: x["PRODUCTGROUPID"].strip() + x["DELIVERYMONTH"], axis=1)
