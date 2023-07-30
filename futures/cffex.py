@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 """
-Date: 2023/07/27
-Desc: 中金所每日REF/EOD
+Date: 2023/07/28
+Desc: 中金所期货每日REF/EOD
 """
 import os
 import pandas as pd

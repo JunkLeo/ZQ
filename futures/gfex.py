@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 """
 Date: 2023/07/28
-Desc: 广期所每日REF/EOD
+Desc: 广期所期货每日REF/EOD
 """
 import os
 import sys

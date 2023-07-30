@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 """
 Date: 2023/07/28
-Desc: 大商所每日REF/EOD
+Desc: 大商所期货每日REF/EOD
 """
 import requests
 import pandas as pd
