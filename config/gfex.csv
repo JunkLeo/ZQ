@@ -1,5 +1,5 @@
-Type,Product,Unit,TickSize
-futures,lc,1,50
-futures,si,5,5
-option,lc,1,10
-option,si,5,1
+Type,Product,Unit,TickSize,ExecType,DeliveryMethod
+futures,lc,1,50,,
+futures,si,5,5,,
+option,lc,1,10,American,Physical
+option,si,5,1,American,Physical
