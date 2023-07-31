@@ -76,6 +76,5 @@ class CFFEX:
 
 if __name__ == "__main__":
     cffex = CFFEX()
-    print(cffex.get_js())
-    #  print(cffex.get_ref("20230728"))
-    #  print(cffex.get_eod("20230728"))
+    print(cffex.get_ref("20230728"))
+    print(cffex.get_eod("20230728"))
