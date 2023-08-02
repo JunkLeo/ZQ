@@ -37,7 +37,7 @@ class SHFE:
         self.tradingday = CN_TradingDay()
 
     def get_contract_info(self, date: str) -> pd.DataFrame:
-        r = requests.get(url=self.ci_url.format(date=date), headers=self.headers)
+        r = requests.get(url=self.ci_url.format(date=date), headers=self.headers, timeout=10)
         ci = pd.DataFrame(r.json()["ContractBaseInfo"])
         ci["ProductID"] = ci["INSTRUMENTID"].map(lambda x: x[:-4])
         ci = ci[["INSTRUMENTID", "ProductID", "BASISPRICE", "OPENDATE", "EXPIREDATE", "STARTDELIVDATE", "ENDDELIVDATE"]]
@@ -45,7 +45,7 @@ class SHFE:
         return ci
 
     def get_trade_para(self, date: str) -> pd.DataFrame:
-        r = requests.get(url=self.tp_url.format(date=date), headers=self.headers)
+        r = requests.get(url=self.tp_url.format(date=date), headers=self.headers, timeout=10)
         tp = pd.DataFrame(r.json()["ContractDailyTradeArgument"])
         tp = tp[["INSTRUMENTID", "UPPER_VALUE", "LOWER_VALUE"]]
         tp["UPPER_VALUE"] = tp["UPPER_VALUE"].astype(float)
@@ -89,7 +89,7 @@ class SHFE:
         return ref
 
     def get_eod(self, date: str) -> pd.DataFrame:
-        r = requests.get(url=self.eod_url.format(date=date), headers=self.headers)
+        r = requests.get(url=self.eod_url.format(date=date), headers=self.headers, timeout=10)
         eod = pd.DataFrame(r.json()["o_curinstrument"])
         eod["InstrumentID"] = eod.apply(lambda x: x["PRODUCTGROUPID"].strip() + x["DELIVERYMONTH"], axis=1)
         eod["TradingDay"] = date

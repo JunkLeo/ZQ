@@ -30,7 +30,7 @@ class GFEX:
         para = {
             "trade_type": ["0"]
         }
-        r = requests.post(url=self.ci_url, headers=self.headers, data=para)
+        r = requests.post(url=self.ci_url, headers=self.headers, data=para, timeout=10)
         ci = pd.DataFrame(r.json()["data"])
         ci = ci[["contractId", "varietyOrder", "unit", "tick", "startTradeDate", "endTradeDate", "endDeliveryDate0"]]
         ci.columns = self.ci_columns
@@ -40,7 +40,7 @@ class GFEX:
         para = {
             "trade_type": ["0"]
         }
-        r = requests.post(url=self.tp_url, headers=self.headers, data=para)
+        r = requests.post(url=self.tp_url, headers=self.headers, data=para, timeout=10)
         tp = pd.DataFrame(r.json()["data"])
         tp = tp[tp["tradeType"] == "0"]
         tp = tp[["contractId", "riseLimit", "fallLimit", "clientBuySerLimit"]]
@@ -59,7 +59,7 @@ class GFEX:
             "trade_date": [date],
             "trade_type": ["0"]
         }
-        r = requests.post(url=self.eod_url, headers=self.headers, data=para)
+        r = requests.post(url=self.eod_url, headers=self.headers, data=para, timeout=10)
         eod = pd.DataFrame(r.json()["data"])
         eod["InstrumentID"] = eod.apply(lambda x: x["varietyOrder"].strip() + x["delivMonth"], axis=1)
         eod["TradingDay"] = date

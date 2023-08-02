@@ -52,7 +52,7 @@ class SHFE:
         return None
 
     def get_contract_info(self, date: str) -> pd.DataFrame:
-        r = requests.get(url=self.ci_url.format(date=date), headers=self.headers)
+        r = requests.get(url=self.ci_url.format(date=date), headers=self.headers, timeout=10)
         ci = pd.DataFrame(r.json()["OptionContractBaseInfo"])
         ci = ci[["INSTRUMENTID", "COMMODITYID", "TRADEUNIT", "PRICETICK", "OPENDATE", "EXPIREDATE"]]
         ci["PRICETICK"] = ci["PRICETICK"].astype(float)
@@ -60,7 +60,7 @@ class SHFE:
         return ci
 
     def get_trade_para(self, date: str) -> pd.DataFrame:
-        r = requests.get(url=self.tp_url.format(date=date), headers=self.headers)
+        r = requests.get(url=self.tp_url.format(date=date), headers=self.headers, timeout=10)
         tp = pd.DataFrame(r.json()["OptionContractDailyTradeArgument"])
         tp = tp[["INSTRUMENTID", "UPPERVALUE", "LOWERVALUE"]]
         tp["UPPERVALUE"] = tp["UPPERVALUE"].astype(float)
@@ -83,7 +83,7 @@ class SHFE:
         return ref
 
     def get_eod(self, date: str) -> pd.DataFrame:
-        r = requests.get(url=self.eod_url.format(date=date), headers=self.headers)
+        r = requests.get(url=self.eod_url.format(date=date), headers=self.headers, timeout=10)
         eod = pd.DataFrame(r.json()["o_curinstrument"])
         eod["TradingDay"] = date
         eod = eod[["INSTRUMENTID", "TradingDay", "OPENPRICE", "HIGHESTPRICE", "LOWESTPRICE", "CLOSEPRICE", "PRESETTLEMENTPRICE", "SETTLEMENTPRICE", "VOLUME", "TURNOVER", "OPENINTEREST"]]

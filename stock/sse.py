@@ -30,7 +30,7 @@ class SSE:
     def get_stock_list(self) -> pd.DataFrame:
         stock_list = pd.DataFrame()
         for stock_type in ["1", "8"]:
-            r = requests.get(url=self.stock_list_url.format(stock_type=stock_type), headers=self.headers)
+            r = requests.get(url=self.stock_list_url.format(stock_type=stock_type), headers=self.headers, timeout=10)
             tmp = pd.read_excel(r.content)
             stock_list = pd.concat([stock_list, tmp])
         stock_list.set_index("A股代码", inplace=True)
@@ -39,7 +39,7 @@ class SSE:
     def get_delist(self) -> pd.DataFrame:
         delist = pd.DataFrame()
         for stock_type in ["1", "8"]:
-            r = requests.get(url=self.delist_list_url.format(stock_type=stock_type), headers=self.headers)
+            r = requests.get(url=self.delist_list_url.format(stock_type=stock_type), headers=self.headers, timeout=10)
             tmp = pd.read_excel(r.content)
             delist = pd.concat([delist, tmp])
         delist.set_index("原公司代码", inplace=True)
@@ -76,7 +76,7 @@ class SSE:
     # ongoing
     def get_eod(self) -> pd.DataFrame:
         t = str(time.time() * 1000).split(".")[0]
-        r = requests.get(self.eod_url.format(t=t), headers=self.headers)
+        r = requests.get(self.eod_url.format(t=t), headers=self.headers, timeout=10)
         data = json.loads(r.text.split("(")[1][:-1])
         eod = pd.DataFrame(data["list"], columns=["InstrumentID", "OpenPrice", "HighPrice", "LowPrice", "ClosePrice", "Volume", "Turnover"])
         eod["TradingDay"] = data["date"]

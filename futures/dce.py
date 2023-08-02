@@ -28,7 +28,7 @@ class DCE:
         para = {
             "contractInformation.trade_type": "0"
         }
-        r = requests.post(url=self.ci_url, data=para, headers=self.headers)
+        r = requests.post(url=self.ci_url, data=para, headers=self.headers, timeout=10)
         ci = pd.read_html(r.text)[0]
         ci.columns = self.ci_columns
         ci["ProductID"] = ci["InstrumentID"].map(lambda x: x[:-4])
@@ -38,7 +38,7 @@ class DCE:
         para = {
             "dayTradingParameters.trade_type": "0"
         }
-        r = requests.post(url=self.tp_url, data=para, headers=self.headers)
+        r = requests.post(url=self.tp_url, data=para, headers=self.headers, timeout=10)
         tp = pd.read_html(r.text)[0]
         tp.columns = ['_'.join(col) for col in tp.columns.values]
         tp = tp[["合约_合约", "涨跌停板_涨停板价位(元)", "涨跌停板_跌停板价位(元)", "持仓限额(手)_客 户"]]
@@ -60,7 +60,7 @@ class DCE:
             "day": date[6:],
             "currDate": date
         }
-        r = requests.post(url=self.eod_url, data=para, headers=self.headers)
+        r = requests.post(url=self.eod_url, data=para, headers=self.headers, timeout=10)
         eod = pd.read_html(r.text)[0]
         columns = [
             "ProductID", "InstrumentID", "OpenPrice", "HighPrice", "LowPrice", "ClosePrice", "PreSettlePrice", "SettlePrice", "Change", "Change1", "Volume", "OpenInterest", "OpenInterestChange",

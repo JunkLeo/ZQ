@@ -24,7 +24,7 @@ class SZE:
 
     def get_eod(self, date: str) -> pd.DataFrame:
         url = self.eod_url.format(date="-".join([date[:4], date[4:6], date[6:]]), randid=random())
-        r = requests.get(url=self.eod_url.format(date="-".join([date[:4], date[4:6], date[6:]]), randid=random()), headers=self.headers)
+        r = requests.get(url=self.eod_url.format(date="-".join([date[:4], date[4:6], date[6:]]), randid=random()), headers=self.headers, timeout=10)
         eod = pd.read_excel(r.content)
         eod = eod[["证券代码", "交易日期", "前收", "开盘", "最高", "最低", "今收", "成交金额(万元)"]]
         eod.columns = self.eod_columns
