@@ -48,7 +48,7 @@ class SSE:
     def get_single_stock_eod(self, stock: str, date: str = "all") -> pd.DataFrame:
         t = str(time.time() * 1000).split(".")[0]
         r = requests.get(self.stock_eod_url.format(t=t, stock=stock), headers=self.headers, timeout=10)
-        data = json.loads(r.text.split("(")[1][:-1])
+        data = json.loads(r.text.split("(", 1)[1][:-1])
         eod = pd.DataFrame(data["kline"], columns=["TradingDay", "OpenPrice", "HighPrice", "LowPrice", "ClosePrice", "Volume", "Turnover"])
         eod["InstrumentID"] = stock
         eod = eod[self.eod_columns]
