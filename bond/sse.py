@@ -31,7 +31,7 @@ class SSE:
         r = requests.get(self.bond_list_url.format(t=t), headers=self.headers, timeout=30)
         data = json.loads(r.text.split("(", 1)[1][:-1])
         bond_list = pd.DataFrame(data["result"])
-        bond_list.set_index("BOND_CODE")
+        bond_list.set_index("BOND_CODE", inplace=True)
         return bond_list
 
     def get_single_bond_eod(self, bond: str, date: str = "all") -> pd.DataFrame:
@@ -54,7 +54,10 @@ class SSE:
                 try:
                     df = self.get_single_bond_eod(bond)
                     break
-                except:
+                except IndexError:
+                    df = pd.DataFrame()
+                    break
+                except Exception:
                     df = pd.DataFrame()
                     retry += 1
                     continue
@@ -75,5 +78,5 @@ class SSE:
 if __name__ == "__main__":
     sse = SSE()
     #  print(sse.get_bond_list())
-    #  print(sse.get_eod())
-    print(sse.get_eod_history())
+    #  print(sse.get_eod_history())
+    print(sse.get_eod())
