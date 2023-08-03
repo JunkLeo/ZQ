@@ -34,4 +34,4 @@ class SZE:
 
 if __name__ == "__main__":
     sze = SZE()
-    print(sze.get_eod("20230731"))
+    print(sze.get_eod("20230803"))
