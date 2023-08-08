@@ -41,7 +41,7 @@ class HKG:
             ["Product", "ContractMonth", "OpenPrice", "HighPrice", "LowPrice", "SettlePrice", "SettlePriceChg", "Volume", "OpenInterest", "OpenInterestChg"],
             ["Product", "ContractMonth", "OpenPrice", "HighPrice", "LowPrice", "SettlePrice", "SettlePriceChg", "ContractHigh", "ContractLow", "Volume", "OpenInterest", "OpenInterestChg"],
             [
-                "Product", "ContractMonth", "AHTOpenPrice", "AHTHighPrice", "AHTLowPrice", "AHTClosePrice", "AHTVolume", "OpenPrice", "HighPrice", "LowPrice", "Volume", "SettlePrice",
+                "Product", "ContractMonth", "AHTOpenPrice", "AHTHighPrice", "AHTLowPrice", "AHTClosePrice", "AHTVolume", "DTOpenPrice", "DTHighPrice", "DTLowPrice", "DTVolume", "SettlePrice",
                 "SettlePriceChg", "ContractHigh", "ContractLow", "CombinedVolume", "OpenInterest", "OpenInterestChg"
             ]
         ]
@@ -137,7 +137,14 @@ class HKG:
         else:
             lines = [[product] + i.split() for i in r.text.replace(",", "").replace("|", "").split("\r\n") if "-" in i and "/" not in i and i.split("-")[0] in self.month_mapper]
             eod = pd.DataFrame(lines, columns=self.product_mapper[product]["columns"] if product in self.product_mapper else self.columns[2])
-        eod = eod[["Product", "ContractMonth", "OpenPrice", "HighPrice", "LowPrice", "SettlePrice", "Volume", "OpenInterest"]]
+        if "AHTOpenPrice" in eod.columns:
+            eod["OpenPrice"] = eod.apply(lambda x: x["DTOpenPrice"] if Decimal(x["AHTOpenPrice"]) == 0 else x["AHTOpenPrice"], axis=1)
+            eod["HighPrice"] = eod.apply(lambda x: max(Decimal(x["AHTHighPrice"]), Decimal(x["DTHighPrice"])), axis=1)
+            eod["LowPrice"] = eod.apply(lambda x: min(Decimal(x["AHTLowPrice"]), Decimal(x["DTLowPrice"])), axis=1)
+            eod["Volume"] = eod.apply(lambda x: Decimal(x["AHTVolume"]) + Decimal(x["DTVolume"]), axis=1)
+        eod["ClosePrice"] = eod["SettlePrice"]
+        eod["InstrumentID"] = eod.apply(lambda x: x["Product"] + x["ContractMonth"].split("-")[1] + self.month_mapper[x["ContractMonth"].split("-")[0]], axis=1)
+        eod = eod[["InstrumentID", "OpenPrice", "HighPrice", "LowPrice", "ClosePrice", "SettlePrice", "Volume", "OpenInterest"]]
         return eod
 
     def get_eod(self, date: str) -> pd.DataFrame:
