@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 """
-Date: 2023/08/04
+Date: 2023/08/08
 Desc: 港交所期货每日EOD
 """
 import os
@@ -143,8 +143,9 @@ class HKG:
             eod["LowPrice"] = eod.apply(lambda x: min(Decimal(x["AHTLowPrice"]), Decimal(x["DTLowPrice"])), axis=1)
             eod["Volume"] = eod.apply(lambda x: Decimal(x["AHTVolume"]) + Decimal(x["DTVolume"]), axis=1)
         eod["ClosePrice"] = eod["SettlePrice"]
+        eod["TradingDay"] = date
         eod["InstrumentID"] = eod.apply(lambda x: x["Product"] + x["ContractMonth"].split("-")[1] + self.month_mapper[x["ContractMonth"].split("-")[0]], axis=1)
-        eod = eod[["InstrumentID", "OpenPrice", "HighPrice", "LowPrice", "ClosePrice", "SettlePrice", "Volume", "OpenInterest"]]
+        eod = eod[["InstrumentID", "TradingDay", "OpenPrice", "HighPrice", "LowPrice", "ClosePrice", "SettlePrice", "Volume", "OpenInterest"]]
         return eod
 
     def get_eod(self, date: str) -> pd.DataFrame:
@@ -153,10 +154,10 @@ class HKG:
         for product, para in products.items():
             df = self.get_eod_by_product(date, product, para)
             eod = pd.concat([eod, df])
-        eod.to_csv("/tmp/20230803.csv", index=False)
+        eod.to_csv("/tmp/20230808.csv", index=False)
         return eod
 
 
 if __name__ == "__main__":
     hkg = HKG()
-    print(hkg.get_eod("20230803"))
+    print(hkg.get_eod("20230808"))
