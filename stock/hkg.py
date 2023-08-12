@@ -83,10 +83,11 @@ class HKG:
             eod[column] = eod[column].map(lambda x: x.strip().replace("N/A", "0.0").replace("-", "0.0").replace(",", ""))
         eod["OpenPrice"] = eod["InstrumentID"].map(lambda x: ops.loc[x, "OpenPrice"] if x in ops.index else "0.0")
         eod = eod[self.eod_columns]
+        eod.to_csv(f"/tmp/{date}.csv", index=False)
         return eod
 
 
 if __name__ == "__main__":
     hkg = HKG()
-    print(hkg.get_ref())
-    print(hkg.get_eod("20230803"))
+    #  print(hkg.get_ref())
+    print(hkg.get_eod("20230810"))
