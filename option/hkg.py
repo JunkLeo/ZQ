@@ -8,6 +8,7 @@ import sys
 import requests
 import pandas as pd
 from decimal import Decimal
+from datetime import datetime
 
 
 class HKG:
@@ -102,9 +103,11 @@ class HKG:
             eod = pd.DataFrame(records, columns=self.columns[0])
         else:
             lines = [
-                [product] + i.split() for i in r.text.replace(",", "").replace("|", "").split("\r\n") if "-" in i and "/" not in i and i.split("-")[-2] in self.month_mapper and len(i.split()) == 20
+                [product] + i.split() for i in r.text.replace(",", "").replace("|", "").split("\r\n") if "-" in i and "/" not in i and (i.split("-")[0] in self.month_mapper or i.split("-")[1] in self.month_mapper) and len(i.split()) == 20
             ]
             eod = pd.DataFrame(lines, columns=self.columns[1])
+        for column in eod.columns[2:]:
+            eod[column] = eod[column].map(lambda x: 0 if x.strip() == "-" else x)
         if "AHTOpenPrice" in eod.columns:
             eod["OpenPrice"] = eod.apply(lambda x: x["DTOpenPrice"] if Decimal(x["AHTOpenPrice"]) == 0 else x["AHTOpenPrice"], axis=1)
             eod["HighPrice"] = eod.apply(lambda x: max(Decimal(x["AHTHighPrice"]), Decimal(x["DTHighPrice"])), axis=1)
@@ -126,5 +129,7 @@ class HKG:
 
 
 if __name__ == "__main__":
+    today = datetime.today().strftime("%Y%m%d")
+    date = sys.argv[1] if len(sys.argv) > 1 else today
     hkg = HKG()
-    print(hkg.get_eod("20230809"))
+    print(hkg.get_eod(date))
