@@ -118,7 +118,8 @@ class HKG:
             try:
                 r = requests.get(self.eod_url.format(product=para, YYMMDD=date[2:]), headers=self.headers, timeout=10)
                 break
-            except:
+            except Exception as e:
+                print(e)
                 retry += 1
                 continue
         if r.status_code != 200:
@@ -130,13 +131,15 @@ class HKG:
                 if self.product_mapper[product]["sep"] in line:
                     p = line.split("-")[0].strip()
                     continue
-                if line.split("-")[0] in self.month_mapper:
+                if line.split("-")[0] in self.month_mapper and "EXPIRED" not in "".join(line.split()):
                     record = [p] + line.split()
                     records.append(record)
             eod = pd.DataFrame(records, columns=self.product_mapper[product]["columns"])
         else:
-            lines = [[product] + i.split() for i in r.text.replace(",", "").replace("|", "").split("\r\n") if "-" in i and "/" not in i and i.split("-")[0] in self.month_mapper]
+            lines = [[product] + i.split() for i in r.text.replace(",", "").replace("|", "").split("\r\n") if "-" in i and "/" not in i and i.split("-")[0] in self.month_mapper and "EXPIRED" not in "".join(i.split())]
             eod = pd.DataFrame(lines, columns=self.product_mapper[product]["columns"] if product in self.product_mapper else self.columns[2])
+        for column in eod.columns[2:]:
+            eod[column] = eod[column].map(lambda x: 0 if x.strip() == "-" else Decimal(x))
         if "AHTOpenPrice" in eod.columns:
             eod["OpenPrice"] = eod.apply(lambda x: x["DTOpenPrice"] if Decimal(x["AHTOpenPrice"]) == 0 else x["AHTOpenPrice"], axis=1)
             eod["HighPrice"] = eod.apply(lambda x: max(Decimal(x["AHTHighPrice"]), Decimal(x["DTHighPrice"])), axis=1)
@@ -160,4 +163,4 @@ class HKG:
 
 if __name__ == "__main__":
     hkg = HKG()
-    print(hkg.get_eod("20230808"))
+    print(hkg.get_eod("20230816"))
