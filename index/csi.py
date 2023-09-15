@@ -3,8 +3,6 @@
 Date: 2023/08/03
 Desc: 中证指数每日REF
 """
-import os
-import sys
 import requests
 import pandas as pd
 

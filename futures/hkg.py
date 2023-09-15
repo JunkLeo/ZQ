@@ -3,8 +3,6 @@
 Date: 2023/08/08
 Desc: 港交所期货每日EOD
 """
-import os
-import sys
 import requests
 import pandas as pd
 from decimal import Decimal
@@ -136,7 +134,11 @@ class HKG:
                     records.append(record)
             eod = pd.DataFrame(records, columns=self.product_mapper[product]["columns"])
         else:
-            lines = [[product] + i.split() for i in r.text.replace(",", "").replace("|", "").split("\r\n") if "-" in i and "/" not in i and i.split("-")[0] in self.month_mapper and "EXPIRED" not in "".join(i.split())]
+            lines = [
+                [product] + i.split()
+                for i in r.text.replace(",", "").replace("|", "").split("\r\n")
+                if "-" in i and "/" not in i and i.split("-")[0] in self.month_mapper and "EXPIRED" not in "".join(i.split())
+            ]
             eod = pd.DataFrame(lines, columns=self.product_mapper[product]["columns"] if product in self.product_mapper else self.columns[2])
         for column in eod.columns[2:]:
             eod[column] = eod[column].map(lambda x: 0 if x.strip() == "-" else Decimal(x))

@@ -3,8 +3,6 @@
 Date: 2023/08/02
 Desc: 上交所债券每日EOD
 """
-import os
-import sys
 import time
 import json
 import requests
@@ -50,15 +48,14 @@ class SSE:
         eod = pd.DataFrame()
         for bond in bond_list.index:
             retry = 0
+            df = pd.DataFrame()
             while retry < 3:
                 try:
                     df = self.get_single_bond_eod(bond)
                     break
                 except IndexError:
-                    df = pd.DataFrame()
                     break
                 except Exception:
-                    df = pd.DataFrame()
                     retry += 1
                     continue
             eod = pd.concat([eod, df])

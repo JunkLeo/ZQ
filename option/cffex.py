@@ -32,7 +32,7 @@ class CFFEX:
         rand_id = str(randint(10, 60))
         r = requests.get(url=self.js_url1.format(id=rand_id), timeout=10)
         date = re.findall("\d{8}", r.text)[0]
-        js = pd.read_xml(self.js_url2.format(YYYYMM=date[:6], DD=date[6:],id=rand_id))
+        js = pd.read_xml(self.js_url2.format(YYYYMM=date[:6], DD=date[6:], id=rand_id))
         js = js[["OPTION_SERIES_ID", "MARGIN_ADJUSTMENT_FACTOR", "MARGINRISKMANAGEPARAM"]]
         js.columns = self.js_columns
         return js

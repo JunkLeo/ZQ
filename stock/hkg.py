@@ -3,11 +3,6 @@
 Date: 2023/08/03
 Desc: 港交所股票每日EOD
 """
-import os
-import re
-import sys
-import time
-import json
 import requests
 import pandas as pd
 from collections import defaultdict
@@ -40,7 +35,7 @@ class HKG:
         for line in raw:
             if "<" in line and not line.startswith("      "):
                 instrumentid = line.split()[0].zfill(5)
-            raw_records[instrumentid] += line.lstrip()
+                raw_records[instrumentid] += line.lstrip()
 
         records = []
         for instrumentid, trans in raw_records.items():

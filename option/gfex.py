@@ -3,8 +3,6 @@
 Date: 2023/07/31
 Desc: 广期所期权每日REF/EOD
 """
-import os
-import sys
 import requests
 import pandas as pd
 from decimal import Decimal

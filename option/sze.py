@@ -3,12 +3,9 @@
 Date: 2023/08/03
 Desc: 深交所期权每日REF/EOD
 """
-import os
-import sys
 import requests
 import pandas as pd
 from random import random
-from decimal import Decimal
 
 
 class SZE:

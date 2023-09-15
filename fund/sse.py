@@ -3,8 +3,6 @@
 Date: 2023/08/02
 Desc: 上交所基金每日EOD
 """
-import os
-import sys
 import time
 import json
 import requests
@@ -49,6 +47,7 @@ class SSE:
         fund_list = self.get_fund_list()
         eod = pd.DataFrame()
         for fund in fund_list.index:
+            df = pd.DataFrame()
             retry = 0
             while retry < 3:
                 try:

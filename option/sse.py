@@ -3,8 +3,6 @@
 Date: 2023/08/02
 Desc: 上交所基金每日EOD
 """
-import os
-import sys
 import time
 import json
 import requests
@@ -46,7 +44,7 @@ class SSE:
         t = str(time.time() * 1000).split(".")[0]
         ue = self.get_underlying_expiremonth()
         eod = pd.DataFrame()
-        for index, row in ue.iterrows():
+        for _, row in ue.iterrows():
             r = requests.get(self.eod_url.format(underlying=row["Underlying"], expiremonth=row["ExpireMonth"], t=t), headers=self.headers, timeout=10)
             data = json.loads(r.text.split("(", 1)[1][:-1])
             df = pd.DataFrame(data["list"], columns=["InstrumentID", "SettlePrice", "PreSettlePrice"])
@@ -54,6 +52,7 @@ class SSE:
             df = df[self.eod_columns]
             eod = pd.concat([eod, df])
         return eod
+
 
 if __name__ == "__main__":
     sse = SSE()

@@ -9,11 +9,9 @@ import requests
 import pandas as pd
 from pathlib import Path
 from decimal import Decimal
-from math import ceil, floor
 parent_path = str(Path(__file__).parents[1])
 sys.path.append(parent_path)
 from tools.tradingday import CN_TradingDay
-from tools.helper import new_round
 config_path = os.path.join(parent_path, "config")
 
 

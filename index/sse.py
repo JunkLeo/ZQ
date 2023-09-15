@@ -3,8 +3,6 @@
 Date: 2023/08/03
 Desc: 上交所指数每日EOD
 """
-import os
-import sys
 import time
 import json
 import requests

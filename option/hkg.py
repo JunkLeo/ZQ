@@ -3,7 +3,6 @@
 Date: 2023/08/09
 Desc: 港交所期权每日EOD
 """
-import os
 import sys
 import requests
 import pandas as pd
@@ -103,7 +102,9 @@ class HKG:
             eod = pd.DataFrame(records, columns=self.columns[0])
         else:
             lines = [
-                [product] + i.split() for i in r.text.replace(",", "").replace("|", "").split("\r\n") if "-" in i and "/" not in i and (i.split("-")[0] in self.month_mapper or i.split("-")[1] in self.month_mapper) and len(i.split()) == 20
+                [product] + i.split()
+                for i in r.text.replace(",", "").replace("|", "").split("\r\n")
+                if "-" in i and "/" not in i and (i.split("-")[0] in self.month_mapper or i.split("-")[1] in self.month_mapper) and len(i.split()) == 20
             ]
             eod = pd.DataFrame(lines, columns=self.columns[1])
         for column in eod.columns[2:]:

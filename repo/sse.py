@@ -3,8 +3,6 @@
 Date: 2023/08/03
 Desc: 上交所债券回购每日EOD
 """
-import os
-import sys
 import time
 import json
 import requests
@@ -49,15 +47,14 @@ class SSE:
         eod = pd.DataFrame()
         for repo in repo_list.index:
             retry = 0
+            df = pd.DataFrame()
             while retry < 3:
                 try:
                     df = self.get_single_repo_eod(repo, date)
                     break
                 except IndexError:
-                    df = pd.DataFrame()
                     break
                 except Exception:
-                    df = pd.DataFrame()
                     retry += 1
                     continue
             eod = pd.concat([eod, df])

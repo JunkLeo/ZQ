@@ -3,8 +3,6 @@
 Date: 2023/08/01
 Desc: 深交所债券每日EOD
 """
-import os
-import sys
 import requests
 import pandas as pd
 from random import random

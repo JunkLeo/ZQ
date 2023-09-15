@@ -3,8 +3,6 @@
 Date: 2023/08/02
 Desc: 上交所股票每日EOD
 """
-import os
-import sys
 import time
 import json
 import requests
@@ -63,6 +61,7 @@ class SSE:
         eod = pd.DataFrame()
         for stock in _all:
             retry = 0
+            df = pd.DataFrame()
             while retry < 3:
                 try:
                     df = self.get_single_stock_eod(stock)
