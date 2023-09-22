@@ -21,6 +21,7 @@ futures,sp,10,2.0,,
 futures,ss,5,5.0,,
 futures,wr,10,1.0,,
 futures,zn,5,5.0,,
+futures,ec,50,0.1,,
 option,ag,15,0.5,American,Physical
 option,al,5,1.0,American,Physical
 option,au,1000,0.02,American,Physical
