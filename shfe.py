@@ -129,7 +129,7 @@ class Option:
 
         self.tradingday = CN_TradingDay()
 
-    # TODO
+    # TODO: Margin
     def calc_margin(self, row):
         """
             Margin

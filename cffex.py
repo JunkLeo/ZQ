@@ -93,7 +93,7 @@ class Option:
         js.columns = self.js_columns
         return js
 
-    # TODO
+    # TODO: Margin
     def calc_margin(self, row):
         """
             Margin
