@@ -133,7 +133,12 @@ class Option:
 
 if __name__ == "__main__":
     cffex = CFFEX()
-    print(cffex.futures.get_ref("20230922"))
-    print(cffex.futures.get_eod("20230922"))
-    print(cffex.option.get_ref("20230922"))
-    print(cffex.option.get_eod("20230922"))
+    import sys
+    from datetime import datetime
+    from loguru import logger
+    date = sys.argv[1] if len(sys.argv) > 1 else datetime.today().strftime("%Y%m%d")
+    logger.info(f"Run {date}")
+    print(cffex.futures.get_ref(date))
+    print(cffex.futures.get_eod(date))
+    print(cffex.option.get_ref(date))
+    print(cffex.option.get_eod(date))

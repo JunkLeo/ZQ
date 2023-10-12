@@ -158,7 +158,12 @@ class Option:
 
 if __name__ == "__main__":
     gfex = GFEX()
+    import sys
+    from datetime import datetime
+    from loguru import logger
+    date = sys.argv[1] if len(sys.argv) > 1 else datetime.today().strftime("%Y%m%d")
+    logger.info(f"Run {date}")
     print(gfex.futures.get_ref())
-    print(gfex.futures.get_eod("20230922"))
+    print(gfex.futures.get_eod(date))
     print(gfex.option.get_ref())
-    print(gfex.option.get_eod("20230922"))
+    print(gfex.option.get_eod(date))

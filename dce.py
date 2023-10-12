@@ -177,7 +177,12 @@ class Option:
 
 if __name__ == "__main__":
     dce = DCE()
+    import sys
+    from datetime import datetime
+    from loguru import logger
+    date = sys.argv[1] if len(sys.argv) > 1 else datetime.today().strftime("%Y%m%d")
+    logger.info(f"Run {date}")
     print(dce.futures.get_ref())
-    print(dce.futures.get_eod("20230922"))
+    print(dce.futures.get_eod(date))
     print(dce.option.get_ref())
-    print(dce.option.get_eod("20230922"))
+    print(dce.option.get_eod(date))

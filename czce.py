@@ -23,21 +23,19 @@ class CZCE:
 class Futures:
 
     def __init__(self):
-        self.ref_url = "http://www.czce.com.cn/cn/DFSStaticFiles/Future/{year}/{date}/FutureDataReferenceData.htm"
-        self.eod_url = "http://www.czce.com.cn/cn/DFSStaticFiles/Future/{year}/{date}/FutureDataDaily.htm"
+        self.ref_url = "http://www.czce.com.cn/cn/DFSStaticFiles/Future/{year}/{date}/FutureDataReferenceData.xml"
+        self.eod_url = "http://www.czce.com.cn/cn/DFSStaticFiles/Future/{year}/{date}/FutureDataDaily.xls"
 
         self.ref_columns = ["InstrumentID", "ProductID", "Unit", "TickSize", "UpperLimitPrice", "LowerLimitPrice", "PositionLimit", "FirstTradingDay", "LastTradingDay", "LastDeliveryDay"]
         self.eod_columns = ["InstrumentID", "TradingDay", "OpenPrice", "HighPrice", "LowPrice", "ClosePrice", "PreSettlePrice", "SettlePrice", "Volume", "Turnover", "OpenInterest"]
 
         self.headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
         }
 
     def get_ref(self, date: str) -> pd.DataFrame:
-        ref = pd.read_html(self.ref_url.format(year=date[:4], date=date))[0]
-        ref.columns = [col[0] for col in ref.columns.values]
-        ref = ref.iloc[:-1, :]
-        ref = ref[["合约代码", "产品代码", "交易单位", "最小变动价位", "涨跌停板", "日持仓限额", "第一交易日", "最后交易日", "最后交割日"]]
+        ref = pd.read_xml(self.ref_url.format(year=date[:4], date=date))
+        ref = ref[["CtrCd", "PrdCd", "CtrSz", "TckSz", "PxLim", "MnthPosLmt", "FrstTrdDt", "LstTrdDt", "LstDlvryDt"]]
         ref.columns = ["InstrumentID", "ProductID", "Unit", "TickSize", "UpperLimit", "PositionLimit", "FirstTradingDay", "LastTradingDay", "LastDeliveryDay"]
         ref["Unit"] = ref["Unit"].map(lambda x: re.match("(\d+)(\D+)", x)[1])
         ref["TickSize"] = ref["TickSize"].map(lambda x: re.match("(\d+\.?\d+)(\D+)", x)[1])
@@ -48,12 +46,13 @@ class Futures:
         return ref
 
     def get_eod(self, date: str) -> pd.DataFrame:
-        eod = pd.read_html(self.eod_url.format(year=date[:4], date=date))[0]
-        eod = eod.iloc[:-1, :]
+        eod = pd.read_excel(self.eod_url.format(year=date[:4], date=date), skiprows=1)
         eod["TradingDay"] = date
         columns = ["合约代码", "TradingDay", "今开盘", "最高价", "最低价", "今收盘", "昨结算", "今结算", "成交量(手)", "成交额(万元)", "持仓量"]
         eod = eod[columns]
         eod.columns = self.eod_columns
+        for column in eod.columns:
+            eod[column] = eod[column].map(lambda x: x.replace(",", "") if not pd.isna(x) else x)
         eod = eod[~eod["SettlePrice"].isna()]
         eod["Turnover"] = eod["Turnover"].map(lambda x: Decimal(str(x)) * 10000)
         return eod
@@ -62,8 +61,8 @@ class Futures:
 class Option:
 
     def __init__(self):
-        self.ref_url = "http://www.czce.com.cn/cn/DFSStaticFiles/Option/{year}/{date}/OptionDataReferenceData.htm"
-        self.eod_url = "http://www.czce.com.cn/cn/DFSStaticFiles/Option/{year}/{date}/OptionDataDaily.htm"
+        self.ref_url = "http://www.czce.com.cn/cn/DFSStaticFiles/Option/{year}/{date}/OptionDataReferenceData.xml"
+        self.eod_url = "http://www.czce.com.cn/cn/DFSStaticFiles/Option/{year}/{date}/OptionDataDaily.xls"
 
         self.ref_columns = [
             "InstrumentID", "ProductID", "Unit", "TickSize", "PositionLimit", "FirstTradingDay", "LastTradingDay", "LastDeliveryDay", "CallPut", "StrikePrice", "ExecType", "DeliveryMethod",
@@ -89,15 +88,15 @@ class Option:
         return None
 
     def get_ref(self, date: str) -> pd.DataFrame:
-        ref = pd.read_html(self.ref_url.format(year=date[:4], date=date))[0]
-        ref.columns = [col[0] for col in ref.columns.values]
-        ref = ref[["合约代码", "产品代码", "交易单位", "最小变动价位", "日持仓限额", "第一交易日", "最后交易日", "结算日", "看涨/看跌", "行权价", "行权类别", "结算方式"]]
+        ref = pd.read_xml(self.ref_url.format(year=date[:4], date=date))
+        ref = ref[["CtrCd", "PrdCd", "CtrSz", "TckSz", "MnthPosLmt", "FrstTrdDt", "LstTrdDt", "SettleDt", "CallPutTp", "StrikePx", "ExerStyleTp", "SettleTp"]]
         ref.columns = self.ref_columns[:-2]
         ref.drop(index=ref[ref["InstrumentID"] == ref["ProductID"]].index, inplace=True)
         ref["Unit"] = ref["Unit"].map(lambda x: re.match("(\d+)(\D+)", x)[1])
         ref["TickSize"] = ref["TickSize"].map(lambda x: re.match("(\d+\.?\d+)(\D+)", x)[1])
         ref["PositionLimit"] = ref["PositionLimit"].map(lambda x: re.match("(\D+)(\d+)(\D+)", x)[2])
         ref["CallPut"] = ref["CallPut"].map(lambda x: "C" if x.strip() == "看涨" else "P")
+        ref["StrikePrice"] = ref["StrikePrice"].map(lambda x: x.replace(",", ""))
         ref["ExecType"] = ref["ExecType"].map(lambda x: "American" if x.strip() == "美式" else "European")
         ref["DeliveryMethod"] = ref["ExecType"].map(lambda x: "Physical" if x.strip() == "实物" else "Cash")
         ref["Underlying"] = ref.apply(lambda x: x["InstrumentID"][:len(x["ProductID"]) + 3], axis=1)
@@ -107,12 +106,13 @@ class Option:
         return ref
 
     def get_eod(self, date: str) -> pd.DataFrame:
-        eod = pd.read_html(self.eod_url.format(year=date[:4], date=date))[0]
-        eod = eod.iloc[:-1, :]
+        eod = pd.read_excel(self.eod_url.format(year=date[:4], date=date), skiprows=1)
         eod["TradingDay"] = date
         columns = ["合约代码", "TradingDay", "今开盘", "最高价", "最低价", "今收盘", "昨结算", "今结算", "成交量(手)", "成交额(万元)", "持仓量"]
         eod = eod[columns]
         eod.columns = self.eod_columns
+        for column in eod.columns:
+            eod[column] = eod[column].map(lambda x: x.replace(",", "") if not pd.isna(x) else x)
         eod = eod[~eod["SettlePrice"].isna()]
         eod["Turnover"] = eod["Turnover"].map(lambda x: Decimal(str(x)) * 10000)
         return eod
@@ -120,7 +120,12 @@ class Option:
 
 if __name__ == "__main__":
     czce = CZCE()
-    print(czce.futures.get_ref("20230922"))
-    print(czce.futures.get_eod("20230922"))
-    print(czce.option.get_ref("20230922"))
-    print(czce.option.get_eod("20230922"))
+    import sys
+    from datetime import datetime
+    from loguru import logger
+    date = sys.argv[1] if len(sys.argv) > 1 else datetime.today().strftime("%Y%m%d")
+    logger.info(f"Run {date}")
+    print(czce.futures.get_ref(date))
+    print(czce.futures.get_eod(date))
+    print(czce.option.get_ref(date))
+    print(czce.option.get_eod(date))

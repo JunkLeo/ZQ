@@ -179,7 +179,9 @@ class Futures:
         products = {}
         df = pd.read_html(self.product_url.format(YYMMDD=date[2:]))[-1]
         for row in df.values:
-            products.update({i: i + "f" for i in row if not pd.isna(i)})
+            products.update({
+                i: i + "f" for i in row if not pd.isna(i)
+            })
         products["MBI"] = "SECTIDXF"
         products["tri"] = "trif"
         products["hgt"] = "hgtf"
@@ -371,6 +373,11 @@ class Option:
 
 if __name__ == "__main__":
     hkg = HKG()
-    print(hkg.stock.get_eod("20230921"))
-    print(hkg.futures.get_eod("20230921"))
-    print(hkg.option.get_eod("20230921"))
+    import sys
+    from datetime import datetime
+    from loguru import logger
+    date = sys.argv[1] if len(sys.argv) > 1 else datetime.today().strftime("%Y%m%d")
+    logger.info(f"Run {date}")
+    print(hkg.stock.get_eod(date))
+    print(hkg.futures.get_eod(date))
+    print(hkg.option.get_eod(date))
