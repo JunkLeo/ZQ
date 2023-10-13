@@ -3,9 +3,10 @@
 Date: 2023/09/22
 Desc: 大商所
 """
-import requests
-import pandas as pd
 from decimal import Decimal
+
+import pandas as pd
+import requests
 
 
 class DCE:
@@ -179,6 +180,7 @@ if __name__ == "__main__":
     dce = DCE()
     import sys
     from datetime import datetime
+
     from loguru import logger
     date = sys.argv[1] if len(sys.argv) > 1 else datetime.today().strftime("%Y%m%d")
     logger.info(f"Run {date}")

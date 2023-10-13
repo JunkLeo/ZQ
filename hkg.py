@@ -3,10 +3,11 @@
 Date: 2023/09/22
 Desc: 港交所
 """
-import requests
-import pandas as pd
 from collections import defaultdict
 from decimal import Decimal
+
+import pandas as pd
+import requests
 pd.set_option('display.unicode.east_asian_width', True)
 
 
@@ -375,6 +376,7 @@ if __name__ == "__main__":
     hkg = HKG()
     import sys
     from datetime import datetime
+
     from loguru import logger
     date = sys.argv[1] if len(sys.argv) > 1 else datetime.today().strftime("%Y%m%d")
     logger.info(f"Run {date}")

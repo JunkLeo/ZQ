@@ -3,10 +3,11 @@
 Date: 2023/09/22
 Desc: 深交所
 """
-import requests
-import pandas as pd
-from random import random
 from decimal import Decimal
+from random import random
+
+import pandas as pd
+import requests
 
 
 class SZE:

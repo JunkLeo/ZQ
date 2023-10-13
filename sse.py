@@ -3,10 +3,11 @@
 Date: 2023/09/22
 Desc: 上交所
 """
-import time
 import json
-import requests
+import time
+
 import pandas as pd
+import requests
 
 
 class SSE:

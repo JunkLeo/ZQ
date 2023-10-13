@@ -5,15 +5,16 @@ Desc: 上期所
 """
 import os
 import sys
-import requests
-import pandas as pd
-from pathlib import Path
 from decimal import Decimal
 from math import floor
+from pathlib import Path
+
+import pandas as pd
+import requests
 parent_path = str(Path(__file__).parents[0])
 sys.path.append(parent_path)
-from tools.tradingday import CN_TradingDay
 from tools.helper import new_round
+from tools.tradingday import CN_TradingDay
 config_path = os.path.join(parent_path, "config")
 
 
@@ -191,6 +192,7 @@ if __name__ == "__main__":
     shfe = SHFE()
     import sys
     from datetime import datetime
+
     from loguru import logger
     date = sys.argv[1] if len(sys.argv) > 1 else datetime.today().strftime("%Y%m%d")
     logger.info(f"Run {date}")

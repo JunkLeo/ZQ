@@ -5,10 +5,11 @@ Desc: 中金所
 """
 import os
 import re
-import requests
-import pandas as pd
-from random import randint
 from pathlib import Path
+from random import randint
+
+import pandas as pd
+import requests
 config_path = os.path.join(Path(__file__).parents[0], "config")
 
 
@@ -135,6 +136,7 @@ if __name__ == "__main__":
     cffex = CFFEX()
     import sys
     from datetime import datetime
+
     from loguru import logger
     date = sys.argv[1] if len(sys.argv) > 1 else datetime.today().strftime("%Y%m%d")
     logger.info(f"Run {date}")

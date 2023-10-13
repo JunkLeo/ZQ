@@ -3,11 +3,12 @@
 Date: 2023/09/22
 Desc: 郑商所
 """
-import sys
 import re
-import pandas as pd
+import sys
 from decimal import Decimal
 from pathlib import Path
+
+import pandas as pd
 parent_path = str(Path(__file__).parents[0])
 sys.path.append(parent_path)
 from tools.helper import new_round
@@ -122,6 +123,7 @@ if __name__ == "__main__":
     czce = CZCE()
     import sys
     from datetime import datetime
+
     from loguru import logger
     date = sys.argv[1] if len(sys.argv) > 1 else datetime.today().strftime("%Y%m%d")
     logger.info(f"Run {date}")
