@@ -34,7 +34,7 @@ class Stock:
 
     def get_eod(self, date: str) -> pd.DataFrame:
         r = requests.get(url=self.eod_url.format(date="-".join([date[:4], date[4:6], date[6:]]), randid=random()), headers=self.headers, timeout=10)
-        eod = pd.read_excel(r.content)
+        eod = pd.read_excel(r.content, engine="openpyxl")
         eod = eod[["证券代码", "交易日期", "前收", "开盘", "最高", "最低", "今收", "成交量(万股)", "成交金额(万元)"]]
         eod.columns = self.eod_columns
         eod["InstrumentID"] = eod["InstrumentID"].map(lambda x: str(x).zfill(6))
@@ -57,7 +57,7 @@ class Bond:
 
     def get_eod(self, date: str) -> pd.DataFrame:
         r = requests.get(url=self.eod_url.format(date="-".join([date[:4], date[4:6], date[6:]]), randid=random()), headers=self.headers, timeout=10)
-        eod = pd.read_excel(r.content)
+        eod = pd.read_excel(r.content, engine="openpyxl")
         eod = eod[["证券代码", "交易日期", "前收", "开盘", "最高", "最低", "今收", "成交金额(万元)"]]
         eod.columns = self.eod_columns
         eod["TradingDay"] = eod["TradingDay"].map(lambda x: x.replace("-", ""))
@@ -78,7 +78,7 @@ class Fund:
 
     def get_eod(self, date: str) -> pd.DataFrame:
         r = requests.get(url=self.eod_url.format(date="-".join([date[:4], date[4:6], date[6:]]), randid=random()), headers=self.headers, timeout=10)
-        eod = pd.read_excel(r.content)
+        eod = pd.read_excel(r.content, engine="openpyxl")
         eod = eod[["证券代码", "交易日期", "前收", "开盘", "最高", "最低", "今收", "成交量（万份）", "成交金额(万元)"]]
         eod.columns = self.eod_columns
         eod["TradingDay"] = eod["TradingDay"].map(lambda x: x.replace("-", ""))
@@ -100,7 +100,7 @@ class Index:
 
     def get_eod(self, date: str) -> pd.DataFrame:
         r = requests.get(url=self.eod_url.format(date="-".join([date[:4], date[4:6], date[6:]]), randid=random()), headers=self.headers, timeout=10)
-        eod = pd.read_excel(r.content)
+        eod = pd.read_excel(r.content, engine="openpyxl")
         eod = eod[["指数代码", "交易日期", "前收", "开盘", "最高", "最低", "今收", "成交金额(亿元)"]]
         eod.columns = self.eod_columns
         eod["TradingDay"] = eod["TradingDay"].map(lambda x: x.replace("-", ""))
@@ -127,7 +127,7 @@ class Option:
 
     def get_eod(self, date: str) -> pd.DataFrame:
         r = requests.get(url=self.eod_url.format(date="-".join([date[:4], date[4:6], date[6:]]), randid=random()), headers=self.headers, timeout=10)
-        eod = pd.read_excel(r.content)
+        eod = pd.read_excel(r.content, engine="openpyxl")
         eod = eod[["合约编码", "交易日期", "前结算价", "今收盘价", "今结算价", "成交量（张）"]]
         eod.columns = self.eod_columns
         eod["TradingDay"] = eod["TradingDay"].map(lambda x: x.replace("-", ""))
@@ -147,7 +147,7 @@ class Repo:
 
     def get_eod(self, date: str) -> pd.DataFrame:
         r = requests.get(url=self.eod_url.format(date="-".join([date[:4], date[4:6], date[6:]]), randid=random()), headers=self.headers, timeout=10)
-        eod = pd.read_excel(r.content)
+        eod = pd.read_excel(r.content, engine="openpyxl")
         eod = eod[["证券代码", "交易日期", "前收", "今收", "成交金额(万元)"]]
         eod.columns = self.eod_columns
         eod = eod[~eod["InstrumentID"].isna()]
@@ -158,4 +158,15 @@ class Repo:
 
 if __name__ == "__main__":
     sze = SZE()
-    print(sze.stock.get_eod("20230921"))
+    import sys
+    from datetime import datetime
+
+    from loguru import logger
+    date = sys.argv[1] if len(sys.argv) > 1 else datetime.today().strftime("%Y%m%d")
+    logger.info(f"Run {date}")
+    print(sze.stock.get_eod(date))
+    print(sze.bond.get_eod(date))
+    print(sze.fund.get_eod(date))
+    print(sze.index.get_eod(date))
+    print(sze.option.get_eod(date))
+    print(sze.repo.get_eod(date))
