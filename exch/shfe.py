@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pandas as pd
 import requests
-parent_path = str(Path(__file__).parents[0])
+parent_path = str(Path(__file__).parents[1])
 sys.path.append(parent_path)
 from tools.helper import new_round
 from tools.tradingday import CN_TradingDay

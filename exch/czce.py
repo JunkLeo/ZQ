@@ -9,7 +9,7 @@ from decimal import Decimal
 from pathlib import Path
 
 import pandas as pd
-parent_path = str(Path(__file__).parents[0])
+parent_path = str(Path(__file__).parents[1])
 sys.path.append(parent_path)
 from tools.helper import new_round
 
@@ -38,10 +38,10 @@ class Futures:
         ref = pd.read_xml(self.ref_url.format(year=date[:4], date=date))
         ref = ref[["CtrCd", "PrdCd", "CtrSz", "TckSz", "PxLim", "MnthPosLmt", "FrstTrdDt", "LstTrdDt", "LstDlvryDt"]]
         ref.columns = ["InstrumentID", "ProductID", "Unit", "TickSize", "UpperLimit", "PositionLimit", "FirstTradingDay", "LastTradingDay", "LastDeliveryDay"]
-        ref["Unit"] = ref["Unit"].map(lambda x: re.match("(\d+)(\D+)", x)[1])
-        ref["TickSize"] = ref["TickSize"].map(lambda x: re.match("(\d+\.?\d+)(\D+)", x)[1])
+        ref["Unit"] = ref["Unit"].map(lambda x: re.match("(\\d+)(\\D+)", x)[1])
+        ref["TickSize"] = ref["TickSize"].map(lambda x: re.match("(\\d+\\.?\\d+)(\\D+)", x)[1])
         ref["UpperLimit"] = ref["UpperLimit"].map(lambda x: new_round(Decimal(x[1:-1]) / 100))
-        ref["PositionLimit"] = ref["PositionLimit"].map(lambda x: re.match("(\D+)(\d+)(\D+)", x)[2])
+        ref["PositionLimit"] = ref["PositionLimit"].map(lambda x: re.match("(\\D+)(\\d+)(\\D+)", x)[2])
         for column in ["FirstTradingDay", "LastTradingDay", "LastDeliveryDay"]:
             ref[column] = ref[column].map(lambda x: x.replace("-", ""))
         return ref
@@ -93,9 +93,9 @@ class Option:
         ref = ref[["CtrCd", "PrdCd", "CtrSz", "TckSz", "MnthPosLmt", "FrstTrdDt", "LstTrdDt", "SettleDt", "CallPutTp", "StrikePx", "ExerStyleTp", "SettleTp"]]
         ref.columns = self.ref_columns[:-2]
         ref.drop(index=ref[ref["InstrumentID"] == ref["ProductID"]].index, inplace=True)
-        ref["Unit"] = ref["Unit"].map(lambda x: re.match("(\d+)(\D+)", x)[1])
-        ref["TickSize"] = ref["TickSize"].map(lambda x: re.match("(\d+\.?\d+)(\D+)", x)[1])
-        ref["PositionLimit"] = ref["PositionLimit"].map(lambda x: re.match("(\D+)(\d+)(\D+)", x)[2])
+        ref["Unit"] = ref["Unit"].map(lambda x: re.match("(\\d+)(\\D+)", x)[1])
+        ref["TickSize"] = ref["TickSize"].map(lambda x: re.match("(\\d+\\.?\\d+)(\\D+)", x)[1])
+        ref["PositionLimit"] = ref["PositionLimit"].map(lambda x: re.match("(\\D+)(\\d+)(\\D+)", x)[2])
         ref["CallPut"] = ref["CallPut"].map(lambda x: "C" if x.strip() == "看涨" else "P")
         ref["StrikePrice"] = ref["StrikePrice"].map(lambda x: x.replace(",", ""))
         ref["ExecType"] = ref["ExecType"].map(lambda x: "American" if x.strip() == "美式" else "European")
