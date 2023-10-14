@@ -95,7 +95,7 @@ class Option:
         return js
 
     # TODO: Margin
-    def calc_margin(self, row):
+    def calc_margin(self):
         """
             Margin
             1.每手看涨期权交易保证金=（合约当日结算价×合约乘数）+max（标的指数当日收盘价×合约乘数×合约保证金调整系数-虚值额，最低保障系数×标的指数当日收盘价×合约乘数×合约保证金调整系数）

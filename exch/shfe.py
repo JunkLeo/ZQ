@@ -131,7 +131,7 @@ class Option:
         self.tradingday = CN_TradingDay()
 
     # TODO: Margin
-    def calc_margin(self, row):
+    def calc_margin(self):
         """
             Margin
             期货期权卖方交易保证金的收取标准为下列两者中较大者：
