@@ -88,7 +88,7 @@ class Stock:
             eod[column] = eod[column].map(lambda x: x.strip().replace("N/A", "0.0").replace("-", "0.0").replace(",", ""))
         eod["OpenPrice"] = eod["InstrumentID"].map(lambda x: ops.loc[x, "OpenPrice"] if x in ops.index else "0.0")
         eod = eod[self.eod_columns]
-        eod.to_csv(f"/tmp/{date}.csv", index=False)
+        eod.to_csv(f"/tmp/stock_{date}.csv", index=False)
         return eod
 
 
@@ -247,7 +247,7 @@ class Futures:
         for product, para in products.items():
             df = self.get_eod_by_product(date, product, para)
             eod = pd.concat([eod, df])
-        eod.to_csv("/tmp/20230808.csv", index=False)
+        eod.to_csv(f"/tmp/futures_{date}.csv", index=False)
         return eod
 
 
@@ -369,6 +369,7 @@ class Option:
             df = self.get_eod_by_product(date, product, para)
             eod = pd.concat([eod, df])
         eod.sort_values(by=["InstrumentID"], inplace=True)
+        eod.to_csv(f"/tmp/option_{date}.csv", index=False)
         return eod
 
 
