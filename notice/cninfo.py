@@ -5,7 +5,7 @@ from loguru import logger
 
 class CNINFO:
 
-    def __init__(self, date) -> None:
+    def __init__(self, date: str) -> None:
         self.date = "-".join([date[:4], date[4:6], date[6:]])
         self.url = "http://www.cninfo.com.cn/new/information/memoQuery"
         self.headers = {

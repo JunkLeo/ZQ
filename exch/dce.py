@@ -3,10 +3,9 @@
 Date: 2023/09/22
 Desc: 大商所
 """
-from decimal import Decimal
-
-import pandas as pd
 import requests
+import pandas as pd
+from decimal import Decimal
 
 
 class DCE:
@@ -25,8 +24,31 @@ class Futures:
 
         self.ci_columns = ["ProductID", "InstrumentID", "Unit", "TickSize", "FirstTradingDay", "LastTradingDay", "LastDeliveryDay"]
         self.tp_columns = ["InstrumentID", "UpperLimitPrice", "LowerLimitPrice", "PositionLimit"]
-        self.ref_columns = ["InstrumentID", "ProductID", "Unit", "TickSize", "UpperLimitPrice", "LowerLimitPrice", "PositionLimit", "FirstTradingDay", "LastTradingDay", "LastDeliveryDay"]
-        self.eod_columns = ["InstrumentID", "TradingDay", "OpenPrice", "HighPrice", "LowPrice", "ClosePrice", "PreSettlePrice", "SettlePrice", "Volume", "Turnover", "OpenInterest"]
+        self.ref_columns = [
+            "InstrumentID",
+            "ProductID",
+            "Unit",
+            "TickSize",
+            "UpperLimitPrice",
+            "LowerLimitPrice",
+            "PositionLimit",
+            "FirstTradingDay",
+            "LastTradingDay",
+            "LastDeliveryDay"
+        ]
+        self.eod_columns = [
+            "InstrumentID",
+            "TradingDay",
+            "OpenPrice",
+            "HighPrice",
+            "LowPrice",
+            "ClosePrice",
+            "PreSettlePrice",
+            "SettlePrice",
+            "Volume",
+            "Turnover",
+            "OpenInterest"
+        ]
 
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
@@ -71,7 +93,19 @@ class Futures:
         r = requests.post(url=self.eod_url, data=para, headers=self.headers, timeout=10)
         eod = pd.read_html(r.text)[0]
         columns = [
-            "ProductID", "InstrumentID", "OpenPrice", "HighPrice", "LowPrice", "ClosePrice", "PreSettlePrice", "SettlePrice", "Change", "Change1", "Volume", "OpenInterest", "OpenInterestChange",
+            "ProductID",
+            "InstrumentID",
+            "OpenPrice",
+            "HighPrice",
+            "LowPrice",
+            "ClosePrice",
+            "PreSettlePrice",
+            "SettlePrice",
+            "Change",
+            "Change1",
+            "Volume",
+            "OpenInterest",
+            "OpenInterestChange",
             "Turnover"
         ]
         eod.columns = columns
@@ -93,10 +127,36 @@ class Option:
         self.ci_columns = ["ProductID", "InstrumentID", "Unit", "TickSize", "FirstTradingDay", "LastTradingDay", "LastDeliveryDay"]
         self.tp_columns = ["InstrumentID", "UpperLimitPrice", "LowerLimitPrice", "PositionLimit"]
         self.ref_columns = [
-            "InstrumentID", "ProductID", "Unit", "TickSize", "UpperLimitPrice", "LowerLimitPrice", "PositionLimit", "FirstTradingDay", "LastTradingDay", "LastDeliveryDay", "CallPut", "StrikePrice",
-            "ExecType", "DeliveryMethod", "Underlying", "Margin"
+            "InstrumentID",
+            "ProductID",
+            "Unit",
+            "TickSize",
+            "UpperLimitPrice",
+            "LowerLimitPrice",
+            "PositionLimit",
+            "FirstTradingDay",
+            "LastTradingDay",
+            "LastDeliveryDay",
+            "CallPut",
+            "StrikePrice",
+            "ExecType",
+            "DeliveryMethod",
+            "Underlying",
+            "Margin"
         ]
-        self.eod_columns = ["InstrumentID", "TradingDay", "OpenPrice", "HighPrice", "LowPrice", "ClosePrice", "PreSettlePrice", "SettlePrice", "Volume", "Turnover", "OpenInterest"]
+        self.eod_columns = [
+            "InstrumentID",
+            "TradingDay",
+            "OpenPrice",
+            "HighPrice",
+            "LowPrice",
+            "ClosePrice",
+            "PreSettlePrice",
+            "SettlePrice",
+            "Volume",
+            "Turnover",
+            "OpenInterest"
+        ]
 
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
@@ -162,8 +222,22 @@ class Option:
         r = requests.post(url=self.eod_url, data=para, headers=self.headers, timeout=10)
         eod = pd.read_html(r.text)[0]
         columns = [
-            "ProductID", "InstrumentID", "OpenPrice", "HighPrice", "LowPrice", "ClosePrice", "PreSettlePrice", "SettlePrice", "Change", "Change1", "Delta", "Volume", "OpenInterest",
-            "OpenInterestChange", "Turnover", "ExecAmount"
+            "ProductID",
+            "InstrumentID",
+            "OpenPrice",
+            "HighPrice",
+            "LowPrice",
+            "ClosePrice",
+            "PreSettlePrice",
+            "SettlePrice",
+            "Change",
+            "Change1",
+            "Delta",
+            "Volume",
+            "OpenInterest",
+            "OpenInterestChange",
+            "Turnover",
+            "ExecAmount"
         ]
         eod.columns = columns
         eod = eod[~eod["SettlePrice"].isna()]

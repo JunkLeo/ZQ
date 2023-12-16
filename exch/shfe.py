@@ -5,16 +5,17 @@ Desc: 上期所
 """
 import os
 import sys
-from decimal import Decimal
+import requests
+import pandas as pd
 from math import floor
 from pathlib import Path
+from decimal import Decimal
 
-import pandas as pd
-import requests
 parent_path = str(Path(__file__).parents[1])
 sys.path.append(parent_path)
 from tools.helper import new_round
 from tools.tradingday import CN_TradingDay
+
 config_path = os.path.join(parent_path, "config")
 
 
@@ -35,8 +36,32 @@ class Futures:
 
         self.ci_columns = ["InstrumentID", "ProductID", "ListPrice", "FirstTradingDay", "LastTradingDay", "FirstDeliveryDay", "LastDeliveryDay"]
         self.tp_columns = ["InstrumentID", "UpperLimit", "LowerLimit"]
-        self.ref_columns = ["InstrumentID", "ProductID", "Unit", "TickSize", "ListPrice", "UpperLimitPrice", "LowerLimitPrice", "PositionLimit", "FirstTradingDay", "LastTradingDay", "LastDeliveryDay"]
-        self.eod_columns = ["InstrumentID", "TradingDay", "OpenPrice", "HighPrice", "LowPrice", "ClosePrice", "PreSettlePrice", "SettlePrice", "Volume", "Turnover", "OpenInterest"]
+        self.ref_columns = [
+            "InstrumentID",
+            "ProductID",
+            "Unit",
+            "TickSize",
+            "ListPrice",
+            "UpperLimitPrice",
+            "LowerLimitPrice",
+            "PositionLimit",
+            "FirstTradingDay",
+            "LastTradingDay",
+            "LastDeliveryDay"
+        ]
+        self.eod_columns = [
+            "InstrumentID",
+            "TradingDay",
+            "OpenPrice",
+            "HighPrice",
+            "LowPrice",
+            "ClosePrice",
+            "PreSettlePrice",
+            "SettlePrice",
+            "Volume",
+            "Turnover",
+            "OpenInterest"
+        ]
 
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
@@ -90,7 +115,9 @@ class Futures:
         ref["PositionLimit"] = None
         pre_date = self.tradingday.get_pre(date)
         pre_eod = self.get_eod(pre_date).set_index("InstrumentID")
-        ref["PreSettlePrice"] = ref.apply(lambda x: pre_eod.loc[x["InstrumentID"], "SettlePrice"] if x["InstrumentID"] in pre_eod.index else x["ListPrice"], axis=1)
+        ref["PreSettlePrice"] = ref.apply(
+            lambda x: pre_eod.loc[x["InstrumentID"], "SettlePrice"] if x["InstrumentID"] in pre_eod.index else x["ListPrice"], axis=1
+        )
         ref["UpperLimitPrice"] = ref.apply(self.calc_upper, axis=1)
         ref["LowerLimitPrice"] = ref.apply(self.calc_lower, axis=1)
         ref = ref[self.ref_columns]
@@ -101,7 +128,19 @@ class Futures:
         eod = pd.DataFrame(r.json()["o_curinstrument"])
         eod["InstrumentID"] = eod.apply(lambda x: x["PRODUCTGROUPID"].strip() + x["DELIVERYMONTH"], axis=1)
         eod["TradingDay"] = date
-        eod = eod[["InstrumentID", "TradingDay", "OPENPRICE", "HIGHESTPRICE", "LOWESTPRICE", "CLOSEPRICE", "PRESETTLEMENTPRICE", "SETTLEMENTPRICE", "VOLUME", "TURNOVER", "OPENINTEREST"]]
+        eod = eod[[
+            "InstrumentID",
+            "TradingDay",
+            "OPENPRICE",
+            "HIGHESTPRICE",
+            "LOWESTPRICE",
+            "CLOSEPRICE",
+            "PRESETTLEMENTPRICE",
+            "SETTLEMENTPRICE",
+            "VOLUME",
+            "TURNOVER",
+            "OPENINTEREST"
+        ]]
         eod.columns = self.eod_columns
         eod = eod[eod["SettlePrice"].str.len() != 0]
         eod["Turnover"] = eod["Turnover"].map(lambda x: Decimal(str(x)) * 10000)
@@ -119,10 +158,35 @@ class Option:
         self.ci_columns = ["InstrumentID", "ProductID", "Unit", "TickSize", "FirstTradingDay", "LastTradingDay"]
         self.tp_columns = ["InstrumentID", "UpperLimitPrice", "LowerLimitPrice"]
         self.ref_columns = [
-            "InstrumentID", "ProductID", "Unit", "TickSize", "UpperLimitPrice", "LowerLimitPrice", "PositionLimit", "FirstTradingDay", "LastTradingDay", "CallPut", "StrikePrice", "ExecType",
-            "DeliveryMethod", "Underlying", "Margin"
+            "InstrumentID",
+            "ProductID",
+            "Unit",
+            "TickSize",
+            "UpperLimitPrice",
+            "LowerLimitPrice",
+            "PositionLimit",
+            "FirstTradingDay",
+            "LastTradingDay",
+            "CallPut",
+            "StrikePrice",
+            "ExecType",
+            "DeliveryMethod",
+            "Underlying",
+            "Margin"
         ]
-        self.eod_columns = ["InstrumentID", "TradingDay", "OpenPrice", "HighPrice", "LowPrice", "ClosePrice", "PreSettlePrice", "SettlePrice", "Volume", "Turnover", "OpenInterest"]
+        self.eod_columns = [
+            "InstrumentID",
+            "TradingDay",
+            "OpenPrice",
+            "HighPrice",
+            "LowPrice",
+            "ClosePrice",
+            "PreSettlePrice",
+            "SettlePrice",
+            "Volume",
+            "Turnover",
+            "OpenInterest"
+        ]
 
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
@@ -178,7 +242,19 @@ class Option:
         r = requests.get(url=self.eod_url.format(date=date), headers=self.headers, timeout=10)
         eod = pd.DataFrame(r.json()["o_curinstrument"])
         eod["TradingDay"] = date
-        eod = eod[["INSTRUMENTID", "TradingDay", "OPENPRICE", "HIGHESTPRICE", "LOWESTPRICE", "CLOSEPRICE", "PRESETTLEMENTPRICE", "SETTLEMENTPRICE", "VOLUME", "TURNOVER", "OPENINTEREST"]]
+        eod = eod[[
+            "INSTRUMENTID",
+            "TradingDay",
+            "OPENPRICE",
+            "HIGHESTPRICE",
+            "LOWESTPRICE",
+            "CLOSEPRICE",
+            "PRESETTLEMENTPRICE",
+            "SETTLEMENTPRICE",
+            "VOLUME",
+            "TURNOVER",
+            "OPENINTEREST"
+        ]]
         eod.columns = self.eod_columns
         eod = eod[eod["SettlePrice"].str.len() != 0]
         eod["InstrumentID"] = eod["InstrumentID"].map(lambda x: x.strip())

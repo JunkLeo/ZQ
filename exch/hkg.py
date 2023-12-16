@@ -3,11 +3,11 @@
 Date: 2023/09/22
 Desc: 港交所
 """
-from collections import defaultdict
-from decimal import Decimal
-
-import pandas as pd
 import requests
+import pandas as pd
+from decimal import Decimal
+from collections import defaultdict
+
 pd.set_option('display.unicode.east_asian_width', True)
 
 
@@ -25,7 +25,20 @@ class Stock:
         self.ref_url = "https://sc.hkex.com.hk/TuniS/www.hkex.com.hk/chi/services/trading/securities/securitieslists/ListOfSecurities_c.xlsx"
         self.eod_url = "https://sc.hkex.com.hk/gb/www.hkex.com.hk/chi/stat/smstat/dayquot/d{YYMMDD}c.htm"
 
-        self.eod_columns = ["InstrumentID", "TradingDay", "Currency", "PreClosePrice", "BidPrice", "AskPrice", "OpenPrice", "HighPrice", "LowPrice", "ClosePrice", "Volume", "Turnover"]
+        self.eod_columns = [
+            "InstrumentID",
+            "TradingDay",
+            "Currency",
+            "PreClosePrice",
+            "BidPrice",
+            "AskPrice",
+            "OpenPrice",
+            "HighPrice",
+            "LowPrice",
+            "ClosePrice",
+            "Volume",
+            "Turnover"
+        ]
 
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
@@ -82,7 +95,19 @@ class Stock:
             else:
                 record = [instrumentid, date] + tmp[-9:]
             records.append(record)
-        columns = ["InstrumentID", "TradingDay", "Currency", "PreClosePrice", "BidPrice", "AskPrice", "HighPrice", "LowPrice", "ClosePrice", "Volume", "Turnover"]
+        columns = [
+            "InstrumentID",
+            "TradingDay",
+            "Currency",
+            "PreClosePrice",
+            "BidPrice",
+            "AskPrice",
+            "HighPrice",
+            "LowPrice",
+            "ClosePrice",
+            "Volume",
+            "Turnover"
+        ]
         eod = pd.DataFrame(records, columns=columns)
         for column in eod.columns[3:]:
             eod[column] = eod[column].map(lambda x: x.strip().replace("N/A", "0.0").replace("-", "0.0").replace(",", ""))
@@ -98,7 +123,19 @@ class Futures:
         self.product_url = "https://sc.hkex.com.hk/gb/www.hkex.com.hk/chi/market/rm/rm_dcrm/riskdata/margin_hkcc/mertc_hkcc_{YYMMDD}.htm"
         self.eod_url = "https://sc.hkex.com.hk/TuniS/www.hkex.com.hk/eng/stat/dmstat/dayrpt/{product}{YYMMDD}.htm"
 
-        self.eod_columns = ["InstrumentID", "TradingDay", "OpenPrice", "HighPrice", "LowPrice", "ClosePrice", "PreSettlePrice", "SettlePrice", "Volume", "Turnover", "OpenInterest"]
+        self.eod_columns = [
+            "InstrumentID",
+            "TradingDay",
+            "OpenPrice",
+            "HighPrice",
+            "LowPrice",
+            "ClosePrice",
+            "PreSettlePrice",
+            "SettlePrice",
+            "Volume",
+            "Turnover",
+            "OpenInterest"
+        ]
 
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
@@ -120,11 +157,51 @@ class Futures:
         }
 
         self.columns = [
-            ["Product", "ContractMonth", "OpenPrice", "HighPrice", "LowPrice", "SettlePrice", "SettlePriceChg", "Volume", "OpenInterest", "OpenInterestChg"],
-            ["Product", "ContractMonth", "OpenPrice", "HighPrice", "LowPrice", "SettlePrice", "SettlePriceChg", "ContractHigh", "ContractLow", "Volume", "OpenInterest", "OpenInterestChg"],
             [
-                "Product", "ContractMonth", "AHTOpenPrice", "AHTHighPrice", "AHTLowPrice", "AHTClosePrice", "AHTVolume", "DTOpenPrice", "DTHighPrice", "DTLowPrice", "DTVolume", "SettlePrice",
-                "SettlePriceChg", "ContractHigh", "ContractLow", "CombinedVolume", "OpenInterest", "OpenInterestChg"
+                "Product",
+                "ContractMonth",
+                "OpenPrice",
+                "HighPrice",
+                "LowPrice",
+                "SettlePrice",
+                "SettlePriceChg",
+                "Volume",
+                "OpenInterest",
+                "OpenInterestChg"
+            ],
+            [
+                "Product",
+                "ContractMonth",
+                "OpenPrice",
+                "HighPrice",
+                "LowPrice",
+                "SettlePrice",
+                "SettlePriceChg",
+                "ContractHigh",
+                "ContractLow",
+                "Volume",
+                "OpenInterest",
+                "OpenInterestChg"
+            ],
+            [
+                "Product",
+                "ContractMonth",
+                "AHTOpenPrice",
+                "AHTHighPrice",
+                "AHTLowPrice",
+                "AHTClosePrice",
+                "AHTVolume",
+                "DTOpenPrice",
+                "DTHighPrice",
+                "DTLowPrice",
+                "DTVolume",
+                "SettlePrice",
+                "SettlePriceChg",
+                "ContractHigh",
+                "ContractLow",
+                "CombinedVolume",
+                "OpenInterest",
+                "OpenInterestChg"
             ]
         ]
 
@@ -237,7 +314,9 @@ class Futures:
             eod["Volume"] = eod.apply(lambda x: Decimal(x["AHTVolume"]) + Decimal(x["DTVolume"]), axis=1)
         eod["ClosePrice"] = eod["SettlePrice"]
         eod["TradingDay"] = date
-        eod["InstrumentID"] = eod.apply(lambda x: x["Product"] + x["ContractMonth"].split("-")[1] + self.month_mapper[x["ContractMonth"].split("-")[0]], axis=1)
+        eod["InstrumentID"] = eod.apply(
+            lambda x: x["Product"] + x["ContractMonth"].split("-")[1] + self.month_mapper[x["ContractMonth"].split("-")[0]], axis=1
+        )
         eod = eod[["InstrumentID", "TradingDay", "OpenPrice", "HighPrice", "LowPrice", "ClosePrice", "SettlePrice", "Volume", "OpenInterest"]]
         return eod
 
@@ -276,10 +355,43 @@ class Option:
         }
 
         self.columns = [
-            ["Product", "ContractMonth", "StrikePrice", "CallPut", "OpenPrice", "HighPrice", "LowPrice", "SettlePrice", "SettlePriceChg", "IV%", "Volume", "OpenInterest", "OpenInterestChg"],
             [
-                "Product", "ContractMonth", "StrikePrice", "CallPut", "AHTOpenPrice", "AHTHighPrice", "AHTLowPrice", "AHTClosePrice", "AHTVolume", "DTOpenPrice", "DTHighPrice", "DTLowPrice",
-                "SettlePrice", "SettlePriceChg", "IV%", "DTVolume", "ContractHigh", "ContractLow", "CombinedVolume", "OpenInterest", "OpenInterestChg"
+                "Product",
+                "ContractMonth",
+                "StrikePrice",
+                "CallPut",
+                "OpenPrice",
+                "HighPrice",
+                "LowPrice",
+                "SettlePrice",
+                "SettlePriceChg",
+                "IV%",
+                "Volume",
+                "OpenInterest",
+                "OpenInterestChg"
+            ],
+            [
+                "Product",
+                "ContractMonth",
+                "StrikePrice",
+                "CallPut",
+                "AHTOpenPrice",
+                "AHTHighPrice",
+                "AHTLowPrice",
+                "AHTClosePrice",
+                "AHTVolume",
+                "DTOpenPrice",
+                "DTHighPrice",
+                "DTLowPrice",
+                "SettlePrice",
+                "SettlePriceChg",
+                "IV%",
+                "DTVolume",
+                "ContractHigh",
+                "ContractLow",
+                "CombinedVolume",
+                "OpenInterest",
+                "OpenInterestChg"
             ]
         ]
 
@@ -330,11 +442,16 @@ class Option:
             raise Exception("requests failed")
         if product in ["MTW", "CUS"]:
             lines = [
-                [product] + i.split() for i in r.text.replace(",", "").replace("|", "").split("\r\n") if "-" in i and "/" not in i and i.split("-")[-2] in self.month_mapper and len(i.split()) == 12
+                [product] + i.split()
+                for i in r.text.replace(",", "").replace("|", "").split("\r\n")
+                if "-" in i and "/" not in i and i.split("-")[-2] in self.month_mapper and len(i.split()) == 12
             ]
             eod = pd.DataFrame(lines, columns=self.columns[0])
         elif product in ["dqe"]:
-            lines = [i for i in r.text.replace(",", "").replace("|", "").split("\r\n") if (i[:3] in self.month_mapper and len(i.split()) == 12) or ("-" in i and "CLOSING PRICE" in i)]
+            lines = [
+                i for i in r.text.replace(",", "").replace("|", "").split("\r\n")
+                if (i[:3] in self.month_mapper and len(i.split()) == 12) or ("-" in i and "CLOSING PRICE" in i)
+            ]
             records = []
             for line in lines:
                 p = line.split("-")[0].split()[1].strip()
@@ -345,9 +462,8 @@ class Option:
             eod = pd.DataFrame(records, columns=self.columns[0])
         else:
             lines = [
-                [product] + i.split()
-                for i in r.text.replace(",", "").replace("|", "").split("\r\n")
-                if "-" in i and "/" not in i and (i.split("-")[0] in self.month_mapper or i.split("-")[1] in self.month_mapper) and len(i.split()) == 20
+                [product] + i.split() for i in r.text.replace(",", "").replace("|", "").split("\r\n") if "-" in i and "/" not in i and
+                (i.split("-")[0] in self.month_mapper or i.split("-")[1] in self.month_mapper) and len(i.split()) == 20
             ]
             eod = pd.DataFrame(lines, columns=self.columns[1])
         for column in eod.columns[2:]:

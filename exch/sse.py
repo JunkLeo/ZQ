@@ -5,9 +5,8 @@ Desc: 上交所
 """
 import json
 import time
-
-import pandas as pd
 import requests
+import pandas as pd
 
 
 class SSE:
@@ -237,7 +236,9 @@ class Index:
         t = str(time.time() * 1000).split(".")[0]
         r = requests.get(self.eod_url.format(t=t), headers=self.headers, timeout=10)
         data = json.loads(r.text.split("(")[1][:-1])
-        eod = pd.DataFrame(data["list"], columns=["InstrumentID", "PreClosePrice", "OpenPrice", "HighPrice", "LowPrice", "ClosePrice", "Volume", "Turnover"])
+        eod = pd.DataFrame(
+            data["list"], columns=["InstrumentID", "PreClosePrice", "OpenPrice", "HighPrice", "LowPrice", "ClosePrice", "Volume", "Turnover"]
+        )
         eod["TradingDay"] = data["date"]
         eod = eod[self.eod_columns]
         return eod

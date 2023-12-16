@@ -3,10 +3,9 @@
 Date: 2023/09/22
 Desc: 广期所
 """
-from decimal import Decimal
-
-import pandas as pd
 import requests
+import pandas as pd
+from decimal import Decimal
 
 
 class GFEX:
@@ -25,8 +24,31 @@ class Futures:
 
         self.ci_columns = ["InstrumentID", "ProductID", "Unit", "TickSize", "FirstTradingDay", "LastTradingDay", "LastDeliveryDay"]
         self.tp_columns = ["InstrumentID", "UpperLimitPrice", "LowerLimitPrice", "PositionLimit"]
-        self.ref_columns = ["InstrumentID", "ProductID", "Unit", "TickSize", "UpperLimitPrice", "LowerLimitPrice", "PositionLimit", "FirstTradingDay", "LastTradingDay", "LastDeliveryDay"]
-        self.eod_columns = ["InstrumentID", "TradingDay", "OpenPrice", "HighPrice", "LowPrice", "ClosePrice", "PreSettlePrice", "SettlePrice", "Volume", "Turnover", "OpenInterest"]
+        self.ref_columns = [
+            "InstrumentID",
+            "ProductID",
+            "Unit",
+            "TickSize",
+            "UpperLimitPrice",
+            "LowerLimitPrice",
+            "PositionLimit",
+            "FirstTradingDay",
+            "LastTradingDay",
+            "LastDeliveryDay"
+        ]
+        self.eod_columns = [
+            "InstrumentID",
+            "TradingDay",
+            "OpenPrice",
+            "HighPrice",
+            "LowPrice",
+            "ClosePrice",
+            "PreSettlePrice",
+            "SettlePrice",
+            "Volume",
+            "Turnover",
+            "OpenInterest"
+        ]
 
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
@@ -86,10 +108,35 @@ class Option:
         self.ci_columns = ["InstrumentID", "ProductID", "Unit", "TickSize", "FirstTradingDay", "LastTradingDay"]
         self.tp_columns = ["InstrumentID", "UpperLimitPrice", "LowerLimitPrice", "PositionLimit"]
         self.ref_columns = [
-            "InstrumentID", "ProductID", "Unit", "TickSize", "UpperLimitPrice", "LowerLimitPrice", "PositionLimit", "FirstTradingDay", "LastTradingDay", "CallPut", "StrikePrice", "ExecType",
-            "DeliveryMethod", "Underlying", "Margin"
+            "InstrumentID",
+            "ProductID",
+            "Unit",
+            "TickSize",
+            "UpperLimitPrice",
+            "LowerLimitPrice",
+            "PositionLimit",
+            "FirstTradingDay",
+            "LastTradingDay",
+            "CallPut",
+            "StrikePrice",
+            "ExecType",
+            "DeliveryMethod",
+            "Underlying",
+            "Margin"
         ]
-        self.eod_columns = ["InstrumentID", "TradingDay", "OpenPrice", "HighPrice", "LowPrice", "ClosePrice", "PreSettlePrice", "SettlePrice", "Volume", "Turnover", "OpenInterest"]
+        self.eod_columns = [
+            "InstrumentID",
+            "TradingDay",
+            "OpenPrice",
+            "HighPrice",
+            "LowPrice",
+            "ClosePrice",
+            "PreSettlePrice",
+            "SettlePrice",
+            "Volume",
+            "Turnover",
+            "OpenInterest"
+        ]
 
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"

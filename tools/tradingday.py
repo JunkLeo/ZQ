@@ -1,8 +1,9 @@
 # -* - coding: UTF-8 -* -
 import os
 import pandas as pd
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
 calendar_path = os.path.join(Path(__file__).parents[1], "calendar")
 
 
@@ -42,6 +43,25 @@ class NaturalDay:
         if day[:6] != next_day[:6]:
             return True
         return False
+
+    def calc_weekday(self, day):
+        week = datetime.strptime(day, "%Y%m%d").weekday()
+        return week
+
+    def is_weekday(self, day):
+        week = self.calc_weekday(day)
+        if week < 5:
+            return True
+        return False
+
+    def get_week_end(self, day):
+        index = self._all.index(day)
+        week_end = day
+        for date in self._all[index:]:
+            if self.calc_weekday(date) < 5:
+                week_end = date
+            else:
+                return week_end
 
 
 class CN_TradingDay(NaturalDay):

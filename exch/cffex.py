@@ -5,11 +5,11 @@ Desc: 中金所
 """
 import os
 import re
+import requests
+import pandas as pd
 from pathlib import Path
 from random import randint
 
-import pandas as pd
-import requests
 config_path = os.path.join(Path(__file__).parents[1], "config")
 
 
@@ -29,10 +29,32 @@ class Futures:
         self.eod_url = "http://www.cffex.com.cn/sj/hqsj/rtj/{YYYYMM}/{DD}/index.xml?id={id}"
 
         self.ref_columns = [
-            "InstrumentID", "ProductID", "Unit", "TickSize", "ListPrice", "UpperLimitPrice", "LowerLimitPrice", "PositionLimit", "FirstTradingDay", "LastTradingDay", "FirstDeliveryDay",
+            "InstrumentID",
+            "ProductID",
+            "Unit",
+            "TickSize",
+            "ListPrice",
+            "UpperLimitPrice",
+            "LowerLimitPrice",
+            "PositionLimit",
+            "FirstTradingDay",
+            "LastTradingDay",
+            "FirstDeliveryDay",
             "LastDeliveryDay"
         ]
-        self.eod_columns = ["InstrumentID", "TradingDay", "OpenPrice", "HighPrice", "LowPrice", "ClosePrice", "PreSettlePrice", "SettlePrice", "Volume", "Turnover", "OpenInterest"]
+        self.eod_columns = [
+            "InstrumentID",
+            "TradingDay",
+            "OpenPrice",
+            "HighPrice",
+            "LowPrice",
+            "ClosePrice",
+            "PreSettlePrice",
+            "SettlePrice",
+            "Volume",
+            "Turnover",
+            "OpenInterest"
+        ]
 
     def get_tip(self) -> pd.DataFrame:
         rand_id = str(randint(10, 60))
@@ -49,7 +71,18 @@ class Futures:
         config = pd.read_csv(self.config_file, dtype=str).set_index("Product")
         ref["Unit"] = ref["PRODUCT_ID"].map(lambda x: config.loc[x, "Unit"])
         ref["TickSize"] = ref["PRODUCT_ID"].map(lambda x: config.loc[x, "TickSize"])
-        columns = ["INSTRUMENT_ID", "PRODUCT_ID", "Unit", "TickSize", "BASIS_PRICE", "UPPERLIMITPRICE", "LOWERLIMITPRICE", "LONG_LIMIT", "OPEN_DATE", "END_TRADING_DAY"]
+        columns = [
+            "INSTRUMENT_ID",
+            "PRODUCT_ID",
+            "Unit",
+            "TickSize",
+            "BASIS_PRICE",
+            "UPPERLIMITPRICE",
+            "LOWERLIMITPRICE",
+            "LONG_LIMIT",
+            "OPEN_DATE",
+            "END_TRADING_DAY"
+        ]
         ref = ref[~ref["INSTRUMENT_ID"].str.contains("-")][columns]
         if mode == "ongoing":
             tip = self.get_tip()
@@ -63,7 +96,19 @@ class Futures:
     def get_eod(self, date: str) -> pd.DataFrame:
         rand_id = str(randint(10, 60))
         eod = pd.read_xml(self.eod_url.format(YYYYMM=date[:6], DD=date[6:], id=rand_id))
-        columns = ["instrumentid", "tradingday", "openprice", "highestprice", "lowestprice", "closeprice", "presettlementprice", "settlementprice", "volume", "turnover", "openinterest"]
+        columns = [
+            "instrumentid",
+            "tradingday",
+            "openprice",
+            "highestprice",
+            "lowestprice",
+            "closeprice",
+            "presettlementprice",
+            "settlementprice",
+            "volume",
+            "turnover",
+            "openinterest"
+        ]
         eod = eod[~eod["instrumentid"].str.contains("-")][columns]
         eod.columns = self.eod_columns
         return eod
@@ -80,10 +125,36 @@ class Option:
 
         self.js_columns = ["Underlying", "AdjustFactor", "GuaranteeFactor"]
         self.ref_columns = [
-            "InstrumentID", "ProductID", "Unit", "TickSize", "ListPrice", "UpperLimitPrice", "LowerLimitPrice", "PositionLimit", "FirstTradingDay", "LastTradingDay", "CallPut", "StrikePrice",
-            "ExecType", "DeliveryMethod", "Underlying", "Margin"
+            "InstrumentID",
+            "ProductID",
+            "Unit",
+            "TickSize",
+            "ListPrice",
+            "UpperLimitPrice",
+            "LowerLimitPrice",
+            "PositionLimit",
+            "FirstTradingDay",
+            "LastTradingDay",
+            "CallPut",
+            "StrikePrice",
+            "ExecType",
+            "DeliveryMethod",
+            "Underlying",
+            "Margin"
         ]
-        self.eod_columns = ["InstrumentID", "TradingDay", "OpenPrice", "HighPrice", "LowPrice", "ClosePrice", "PreSettlePrice", "SettlePrice", "Volume", "Turnover", "OpenInterest"]
+        self.eod_columns = [
+            "InstrumentID",
+            "TradingDay",
+            "OpenPrice",
+            "HighPrice",
+            "LowPrice",
+            "ClosePrice",
+            "PreSettlePrice",
+            "SettlePrice",
+            "Volume",
+            "Turnover",
+            "OpenInterest"
+        ]
 
     def get_js(self) -> pd.DataFrame:
         rand_id = str(randint(10, 60))
@@ -112,7 +183,18 @@ class Option:
         config = pd.read_csv(self.config_file, dtype=str).set_index("Product")
         ref["Unit"] = ref["PRODUCT_ID"].map(lambda x: config.loc[x, "Unit"])
         ref["TickSize"] = ref["PRODUCT_ID"].map(lambda x: config.loc[x, "TickSize"])
-        columns = ["INSTRUMENT_ID", "PRODUCT_ID", "Unit", "TickSize", "BASIS_PRICE", "UPPERLIMITPRICE", "LOWERLIMITPRICE", "LONG_LIMIT", "OPEN_DATE", "END_TRADING_DAY"]
+        columns = [
+            "INSTRUMENT_ID",
+            "PRODUCT_ID",
+            "Unit",
+            "TickSize",
+            "BASIS_PRICE",
+            "UPPERLIMITPRICE",
+            "LOWERLIMITPRICE",
+            "LONG_LIMIT",
+            "OPEN_DATE",
+            "END_TRADING_DAY"
+        ]
         ref = ref[ref["INSTRUMENT_ID"].str.contains("-")][columns]
         ref["CallPut"] = ref["INSTRUMENT_ID"].map(lambda x: x.split("-")[1])
         ref["StrikePrice"] = ref["INSTRUMENT_ID"].map(lambda x: x.split("-")[2])
@@ -126,7 +208,19 @@ class Option:
     def get_eod(self, date: str) -> pd.DataFrame:
         rand_id = str(randint(10, 60))
         eod = pd.read_xml(self.eod_url.format(YYYYMM=date[:6], DD=date[6:], id=rand_id))
-        columns = ["instrumentid", "tradingday", "openprice", "highestprice", "lowestprice", "closeprice", "presettlementprice", "settlementprice", "volume", "turnover", "openinterest"]
+        columns = [
+            "instrumentid",
+            "tradingday",
+            "openprice",
+            "highestprice",
+            "lowestprice",
+            "closeprice",
+            "presettlementprice",
+            "settlementprice",
+            "volume",
+            "turnover",
+            "openinterest"
+        ]
         eod = eod[eod["instrumentid"].str.contains("-")][columns]
         eod.columns = self.eod_columns
         return eod
